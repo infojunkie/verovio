@@ -1963,6 +1963,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         else if (IsElement(child, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
             this->ReadMusicXmlPrint(child, section);
         }
+        else if (IsElement(child, "sound")) {
+            this->ReadMusicXmlSound(child, measure);
+        }
     }
 
     // set metcon to false for pickup measures
