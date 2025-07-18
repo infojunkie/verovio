@@ -1935,6 +1935,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         if (IsElement(child, "attributes")) {
             this->ReadMusicXmlAttributes(child, section, measure, measureNum);
         }
+        else if (IsElement(child, "sound")) {
+            this->ReadMusicXmlSound(child, measure);
+        }
         else if (IsElement(child, "backup")) {
             this->ReadMusicXmlBackup(child, measure, measureNum);
         }
@@ -1962,9 +1965,6 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         // for now only check first part
         else if (IsElement(child, "print") && node.select_node("parent::part[not(preceding-sibling::part)]")) {
             this->ReadMusicXmlPrint(child, section);
-        }
-        else if (IsElement(child, "sound")) {
-            this->ReadMusicXmlSound(child, measure);
         }
     }
 
