@@ -1085,6 +1085,16 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
     }
 }
 
+int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
+{
+    int pitch = note->GetMIDIPitch(m_transSemi, m_octaveShift);
+
+    // Map the incoming pitch accorrding to the custom tuning
+    if (scoreDef->HasTuneCustom()) {
+
+    }
+}
+
 //----------------------------------------------------------------------------
 // GenerateTimemapFunctor
 //----------------------------------------------------------------------------
