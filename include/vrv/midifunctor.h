@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "alignfunctor.h"
+#include "instrdef.h"
 
 namespace smf {
 class MidiFile;
