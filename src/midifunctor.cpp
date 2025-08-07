@@ -616,6 +616,7 @@ GenerateMIDIFunctor::GenerateMIDIFunctor(smf::MidiFile *midiFile) : ConstFunctor
     m_noCue = false;
     m_controlEvents = false;
     m_scoreDef = NULL;
+    m_instrDef = NULL;
 }
 
 FunctorCode GenerateMIDIFunctor::VisitBeatRpt(const BeatRpt *beatRpt)
