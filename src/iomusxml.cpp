@@ -4554,7 +4554,7 @@ std::string MusicXmlInput::AccidentalToAccidStr(const std::string &accidental)
         case ACCIDENTAL_WRITTEN_sx: value = "sx"; break;
         case ACCIDENTAL_WRITTEN_ts: value = "ts"; break;
         case ACCIDENTAL_WRITTEN_tf: value = "tf"; break;
-        case ACCIDENTAL_WRITTEN_n: value = "n"; break;
+        case ACCIDENTAL_WRITTEN_n: value = ""; break; // Ignore natural because we're ignoring it on output too
         case ACCIDENTAL_WRITTEN_nf: value = "nf"; break;
         case ACCIDENTAL_WRITTEN_ns: value = "ns"; break;
         case ACCIDENTAL_WRITTEN_su: value = "su"; break;
