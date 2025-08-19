@@ -123,21 +123,13 @@ jobs:
             compiler: clang
             version: "18"
 
-          - os: macos-latest
+          - os: macos-14
             compiler: xcode
             version: "15.4"
-
+          
           - os: macos-latest
-            compiler: g++
-            version: "12"
-            
-          - os: macos-latest
-            compiler: g++
-            version: "13"
-            
-          - os: macos-latest
-            compiler: g++
-            version: "14"
+            compiler: xcode
+            version: "16.0"
 
     steps:
       - name: Checkout main repo
