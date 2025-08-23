@@ -2860,6 +2860,12 @@ void MusicXmlInput::ReadMusicXmlNote(
             accid->SetAccid(ConvertAccidentalToAccid(accidental.text().as_string()));
             accid->SetColor(accidental.attribute("color").as_string());
             accid->SetGlyphName(accidental.attribute("smufl").as_string());
+            if (accid->HasGlyphName()) {
+                accid->SetGlyphAuth("smufl");
+                if (!accid->HasAccid()) {
+                    accid->SetAccid(ACCIDENTAL_WRITTEN_n);
+                }
+            }
             accid->SetPlace(accid->AttPlacementRelEvent::StrToStaffrel(accidental.attribute("placement").as_string()));
             if (accidental.attribute("id")) accid->SetID(accidental.attribute("id").as_string());
             if (HasAttributeWithValue(accidental, "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
@@ -3753,7 +3759,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     assert(node);
     assert(measure);
 
-    // get MEI tuning.
+    // get MEI tuning
     pugi::xpath_node meiTuning = node.select_node("play/other-play[@type='tuning-mei']");
     if (meiTuning) {
         const std::string value = std::regex_replace(meiTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
@@ -3788,8 +3794,17 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
                     if (!accid.empty()) {
                         InstAccidental accidental;
                         accidental.SetAccid(ConvertAccidentalToAccid(accid));
-                        if (accidental.HasAccid() && accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
-                            mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                        accidental.SetAccid(accidental.StrToAccidentalWritten(accid));
+                        if (m_doc->GetResources().GetGlyphCode(accid)) {
+                            mei += accid;
+                        }
+                        else if (accidental.HasAccid()) {
+                            if (accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
+                                mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                            }
+                        }
+                        else {
+                            LogError("Tuning accidental \"%s\" is neither a MusicXML accidental nor a SMuFL glyph", accid.c_str());
                         }
                     }
                     map.insert({mei, note});
@@ -3800,7 +3815,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
             }
         }
         catch (Tunings::TuningError &error) {
-            LogError("Error parsing Ableton tuning: %s", error.what());
+            LogError("Tuning is invalid: %s", error.what());
         }
     }
 }

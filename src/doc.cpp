@@ -498,8 +498,16 @@ void Doc::ExportMIDI(smf::MidiFile *midiFile)
                     if (!accid.empty()) {
                         InstAccidental accidental;
                         accidental.SetAccid(accidental.StrToAccidentalWritten(accid));
-                        if (accidental.HasAccid() && accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
-                            mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                        if (this->GetResources().GetGlyphCode(accid)) {
+                            mei += accid;
+                        }
+                        else if (accidental.HasAccid()) {
+                            if (accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
+                                mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                            }
+                        }
+                        else {
+                            LogError("Tuning accidental \"%s\" is neither a MEI accidental nor a SMuFL glyph", accid.c_str());
                         }
                     }
                     map.insert({mei, note});
