@@ -1107,15 +1107,18 @@ int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
         std::string noteName(1, (pname - 1 + ('C' - 'A')) % 7 + 'A');
 
         const Accid *accid = note->GetDrawingAccid();
-        if (accid && accid->HasAccid()) {
-            if (accid->GetAccid() == ACCIDENTAL_WRITTEN_n) {
+        if (accid) {
+            const AttAccidental *att = dynamic_cast<const AttAccidental *>(accid);
+            assert(att);
+            if (accid->GetAccid() == ACCIDENTAL_WRITTEN_n || accid->GetAccidGes() == ACCIDENTAL_GESTURAL_n) {
                 if (accid->HasGlyphName()) {
                     noteName += accid->GetGlyphName();
                 }
             }
-            else {
-                const AttAccidental *att = dynamic_cast<const AttAccidental *>(accid);
-                assert(att);
+            else if (accid->HasAccidGes()) {
+                noteName += att->AccidentalGesturalToStr(accid->GetAccidGes());
+            }
+            else if (accid->HasAccid()) {
                 noteName += att->AccidentalWrittenToStr(accid->GetAccid());
             }
         }

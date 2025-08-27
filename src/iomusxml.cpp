@@ -821,6 +821,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
     assert(root);
 
+    // initialize accidentals map
+    this->ResetAccidGes();
+
     // check for multimetric music
     bool multiMetric = root.select_node("/score-partwise/part/measure[@non-controlling='yes']");
     if (multiMetric) {
@@ -2913,6 +2916,33 @@ void MusicXmlInput::ReadMusicXmlNote(
             else {
                 note->SetOct(octaveNum);
             }
+
+            // adjust gestural accidental (including glyph) based on carried-over accidentals
+            // or update the carried-over accidentals with current gestural accidental value
+            if (note->HasPname()) {
+                Accid *accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
+                if (!accid) {
+                    accid = new Accid();
+                    note->AddChild(accid);
+                    accid->IsAttribute(true);
+                }
+                if (!accid->HasAccidGes()) {
+                    try {
+                        auto current = m_currentAccids.at(note->GetPname());
+                        if (!IsSameAccidWrittenGestural(accid->GetAccid(), current.m_accidGes)) {
+                            accid->SetAccidGes(current.m_accidGes);
+                            accid->SetGlyphAuth(current.m_glyphAuth);
+                            accid->SetGlyphName(current.m_glyphName);
+                        }
+                    }
+                    catch (std::out_of_range &e) {
+                        // do nothing
+                    }
+                }
+                else {
+                    // TODO
+                }
+            }
         }
         else if (node.child("unpitched")) {
             pugi::xml_node unpitched = node.child("unpitched");
@@ -4093,7 +4123,41 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
         }
     }
 
+    // adjust the accidentals map to this key signature
+    this->ResetAccidGes(keySig);
+
     return keySig;
+}
+
+void MusicXmlInput::ResetAccidGes(const KeySig *keySig)
+{
+    // inspired by KeySig::FillMap() but without the octave repetitions
+    m_currentAccids.clear();
+    for (int i = PITCHNAME_c; i <= PITCHNAME_g; i++) {
+        m_currentAccids[static_cast<data_PITCHNAME>(i)] = musicxml::AccidGes();
+    }
+
+    if (!keySig) return;
+
+    const ListOfConstObjects &childList = keySig->GetList(); // make sure it's initialized
+    if (!childList.empty()) {
+        for (const Object *child : childList) {
+            const KeyAccid *keyAccid = vrv_cast<const KeyAccid *>(child);
+            assert(keyAccid);
+            m_currentAccids[keyAccid->GetPname()] = musicxml::AccidGes(
+                Att::AccidentalWrittenToGestural(keyAccid->GetAccid()),
+                keyAccid->GetGlyphName(),
+                keyAccid->GetGlyphAuth()
+            );
+        }
+        return;
+    }
+
+    data_ACCIDENTAL_WRITTEN accidType = keySig->GetAccidType();
+    data_ACCIDENTAL_GESTURAL accidGesType = Att::AccidentalWrittenToGestural(accidType);
+    for (int i = 0; i < keySig->GetAccidCount(true); ++i) {
+        m_currentAccids[KeySig::GetAccidPnameAt(accidType, i)] = musicxml::AccidGes(accidGesType, "", "");
+    }
 }
 
 bool MusicXmlInput::IsSameAccidWrittenGestural(data_ACCIDENTAL_WRITTEN written, data_ACCIDENTAL_GESTURAL gestural)
