@@ -593,6 +593,8 @@ private:
     std::map<int, int> m_multiRests;
     /* a map of current accidental for each pitch class */
     std::map<data_PITCHNAME, musicxml::AccidGes> m_currentAccids;
+    /* current key signature */
+    KeySig *m_currentKeySig = NULL;
 
 #endif // NO_MUSICXML_SUPPORT
 };

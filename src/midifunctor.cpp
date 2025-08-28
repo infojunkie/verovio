@@ -1101,7 +1101,7 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
 {
     if (m_scoreDef && m_scoreDef->HasTuneCustom()) {
-        // Construct note name for tuning lookup.
+        // construct note name for tuning lookup
         data_PITCHNAME pname = note->GetPname();
         if (note->HasPnameGes()) pname = note->GetPnameGes();
         std::string noteName(1, (pname - 1 + ('C' - 'A')) % 7 + 'A');
@@ -1115,19 +1115,28 @@ int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
                     noteName += accid->GetGlyphName();
                 }
             }
-            else if (accid->HasAccidGes()) {
-                noteName += att->AccidentalGesturalToStr(accid->GetAccidGes());
-            }
             else if (accid->HasAccid()) {
                 noteName += att->AccidentalWrittenToStr(accid->GetAccid());
+            }
+            else if (accid->HasAccidGes()) {
+                noteName += att->AccidentalGesturalToStr(accid->GetAccidGes());
             }
         }
         int oct = note->GetOct() + m_octaveShift;
         if (note->HasOctGes()) oct = note->GetOctGes();
 
-        // Lookup note in the tuning and map it to a MIDI key
+        // lookup note in the tuning and map it to a MIDI key
         try {
             Tunings::Tuning tuning = m_scoreDef->GetTuneCustom();
+            // FIXME special case: when we encounter a B pitch that's in scale degree 0, increment its oct by 1
+            // otherwise, it would be in the lower octave
+            const auto it = std::find(
+                tuning.notationMapping.names.begin(),
+                tuning.notationMapping.names.end(),
+                m_scoreDef->GetTuneCustomNoteMap().at(noteName)
+            );
+            int scalePosition = (it - tuning.notationMapping.names.begin() + 1) % tuning.notationMapping.count;
+            if (pname == PITCHNAME_b && scalePosition == 0) oct++;
             return tuning.midiNoteForNoteName(m_scoreDef->GetTuneCustomNoteMap().at(noteName), oct);
         }
         catch (Tunings::TuningError &e) {

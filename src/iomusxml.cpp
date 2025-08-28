@@ -1630,6 +1630,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     assert(node);
     assert(measure);
 
+    // re-initialize the accidentals to the current key signature.
+    this->ResetAccidGes(m_currentKeySig);
+
     const std::string measureNum = node.attribute("number").as_string();
     if (node.attribute("id")) measure->SetID(node.attribute("id").as_string());
     if (measure != NULL) measure->SetN(measureNum);
@@ -2918,7 +2921,8 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
 
             // adjust gestural accidental (including glyph) based on carried-over accidentals
-            // or update the carried-over accidentals with current gestural accidental value
+            // or update the carried-over accidentals with current gestural accidental value.
+            // NOTE: this overrides the handling of "alter" element above.
             if (note->HasPname()) {
                 Accid *accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
@@ -2926,21 +2930,23 @@ void MusicXmlInput::ReadMusicXmlNote(
                     note->AddChild(accid);
                     accid->IsAttribute(true);
                 }
-                if (!accid->HasAccidGes()) {
+                if (!accid->HasAccid()) {
                     try {
                         auto current = m_currentAccids.at(note->GetPname());
-                        if (!IsSameAccidWrittenGestural(accid->GetAccid(), current.m_accidGes)) {
-                            accid->SetAccidGes(current.m_accidGes);
-                            accid->SetGlyphAuth(current.m_glyphAuth);
-                            accid->SetGlyphName(current.m_glyphName);
-                        }
+                        accid->SetAccidGes(current.m_accidGes);
+                        accid->SetGlyphAuth("hello");
+                        accid->SetGlyphName(current.m_glyphName);
                     }
                     catch (std::out_of_range &e) {
-                        // do nothing
+                        // unknown note, do nothing
                     }
                 }
                 else {
-                    // TODO
+                    m_currentAccids[note->GetPname()] = musicxml::AccidGes(
+                        Att::AccidentalWrittenToGestural(accid->GetAccid()),
+                        accid->GetGlyphName(),
+                        accid->GetGlyphAuth()
+                    );
                 }
             }
         }
@@ -3834,7 +3840,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
                             }
                         }
                         else {
-                            LogError("Tuning accidental \"%s\" is neither a MusicXML accidental nor a SMuFL glyph", accid.c_str());
+                            LogError("MusicXML import: Tuning accidental \"%s\" is neither a MusicXML accidental nor a SMuFL glyph", accid.c_str());
                         }
                     }
                     map.insert({mei, note});
@@ -3845,7 +3851,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
             }
         }
         catch (Tunings::TuningError &error) {
-            LogError("Tuning is invalid: %s", error.what());
+            LogError("MusicXML import: Tuning is invalid: %s", error.what());
         }
     }
 }
@@ -4109,7 +4115,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
             keyAccid->SetPname(ConvertStepToPitchName(keyStep.text().as_string()));
             if (std::strncmp(keyStep.next_sibling().name(), "key-alter", 9) == 0) {
                 data_ACCIDENTAL_GESTURAL accidValue = ConvertAlterToAccid(keyStep.next_sibling().text().as_float());
-                keyAccid->SetAccid(AreaPosInterface::AccidentalGesturalToWritten(accidValue));
+                keyAccid->SetAccid(Att::AccidentalGesturalToWritten(accidValue));
                 if (std::strncmp(keyStep.next_sibling().next_sibling().name(), "key-accidental", 14) == 0) {
                     keyAccid->SetAccid(
                         this->ConvertAccidentalToAccid(keyStep.next_sibling().next_sibling().text().as_string()));
@@ -4125,6 +4131,7 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
 
     // adjust the accidentals map to this key signature
     this->ResetAccidGes(keySig);
+    m_currentKeySig = keySig;
 
     return keySig;
 }
