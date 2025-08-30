@@ -2897,21 +2897,8 @@ void MusicXmlInput::ReadMusicXmlNote(
         pugi::xml_node pitch = node.child("pitch");
         if (pitch && !isTablature) {
             const std::string stepStr = pitch.child("step").text().as_string();
-            const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            if (pitch.child("alter")) {
-                Accid *accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
-                if (!accid) {
-                    accid = new Accid();
-                    note->AddChild(accid);
-                    accid->IsAttribute(true);
-                }
-                const data_ACCIDENTAL_GESTURAL accidGes = ConvertAlterToAccid(alterVal);
-                if (!IsSameAccidWrittenGestural(accid->GetAccid(), accidGes)) {
-                    accid->SetAccidGes(accidGes);
-                }
-            }
             if (m_octDis[staff->GetN()] != 0) {
                 note->SetOct(octaveNum - m_octDis[staff->GetN()]);
                 note->SetOctGes(octaveNum);
@@ -2922,7 +2909,6 @@ void MusicXmlInput::ReadMusicXmlNote(
 
             // adjust gestural accidental (including glyph) based on carried-over accidentals
             // or update the carried-over accidentals with current gestural accidental value.
-            // FIXME! this overrides the handling of "alter" element above.
             if (note->HasPname()) {
                 Accid *accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
