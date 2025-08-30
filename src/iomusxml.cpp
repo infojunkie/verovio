@@ -2922,7 +2922,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
             // adjust gestural accidental (including glyph) based on carried-over accidentals
             // or update the carried-over accidentals with current gestural accidental value.
-            // NOTE: this overrides the handling of "alter" element above.
+            // FIXME! this overrides the handling of "alter" element above.
             if (note->HasPname()) {
                 Accid *accid = vrv_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
@@ -2934,8 +2934,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                     try {
                         auto current = m_currentAccids.at(note->GetPname());
                         accid->SetAccidGes(current.m_accidGes);
-                        accid->SetGlyphAuth("hello");
                         accid->SetGlyphName(current.m_glyphName);
+                        accid->SetGlyphAuth(current.m_glyphAuth);
                     }
                     catch (std::out_of_range &e) {
                         // unknown note, do nothing
@@ -3828,18 +3828,22 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
                     std::string mei = note_names[1].str();
                     std::string accid = note_names[2].str();
                     if (!accid.empty()) {
-                        InstAccidental accidental;
-                        accidental.SetAccid(ConvertAccidentalToAccid(accid));
-                        accidental.SetAccid(accidental.StrToAccidentalWritten(accid));
+                        bool valid = false;
                         if (m_doc->GetResources().GetGlyphCode(accid)) {
                             mei += accid;
-                        }
-                        else if (accidental.HasAccid()) {
-                            if (accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
-                                mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
-                            }
+                            valid = true;
                         }
                         else {
+                            InstAccidental accidental;
+                            accidental.SetAccid(ConvertAccidentalToAccid(accid));
+                            if (accidental.HasAccid()) {
+                                valid = true;
+                                if (accidental.GetAccid() != ACCIDENTAL_WRITTEN_n) {
+                                    mei += accidental.AccidentalWrittenToStr(accidental.GetAccid());
+                                }
+                            }
+                        }
+                        if (!valid) {
                             LogError("MusicXML import: Tuning accidental \"%s\" is neither a MusicXML accidental nor a SMuFL glyph", accid.c_str());
                         }
                     }
