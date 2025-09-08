@@ -1508,6 +1508,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
 
 void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *parent)
 {
+    const bool invisible = HasAttributeWithValue(time, "print-object", "no");
     if ((time.select_nodes("beats").size() > 1) || time.select_node("interchangeable")) {
         MeterSigGrp *meterSigGrp = new MeterSigGrp();
         if (time.attribute("id")) {
@@ -1519,6 +1520,9 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
         std::tie(m_meterCount, m_meterUnit) = this->GetMeterSigGrpValues(time, meterSigGrp);
         if (interchangeable) {
             std::tie(std::ignore, std::ignore) = this->GetMeterSigGrpValues(interchangeable.node(), meterSigGrp);
+        }
+        if (invisible) {
+            meterSigGrp->SetVisible(BOOLEAN_false);
         }
         parent->AddChild(meterSigGrp);
     }
@@ -1555,6 +1559,9 @@ void MusicXmlInput::ReadMusicXMLMeterSig(const pugi::xml_node &time, Object *par
             else {
                 meterSig->SetVisible(BOOLEAN_false);
             }
+        }
+        if (invisible) {
+            meterSig->SetVisible(BOOLEAN_false);
         }
         parent->AddChild(meterSig);
     }
