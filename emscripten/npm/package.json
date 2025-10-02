@@ -1,7 +1,7 @@
 {
   "name": "@music-i18n/verovio",
-  "version": "1.0.1",
-  "description": "Forked version of Verovio that includes music-i18n fixes.",
+  "version": "1.0.2",
+  "description": "Forked version of Verovio with music-i18n support.",
   "main": "dist/verovio-toolkit-wasm.js",
   "exports": {
     ".": "./dist/verovio-toolkit-wasm.js",
