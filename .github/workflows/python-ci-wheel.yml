@@ -23,14 +23,14 @@ jobs:
       fail-fast: false
       # Build the wheels for Linux, Windows and macOS
       matrix:
-        os: [macos-13, macos-15, windows-latest, ubuntu-latest, ubuntu-24.04-arm]
+        os: [macos-15-intel, macos-latest, windows-latest, ubuntu-latest, ubuntu-24.04-arm]
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
         architecture: [x86, x64, arm64]
         include:
-          - os: macos-13
+          - os: macos-15-intel
             architecture: x64
             platform_id: macosx_x86_64
-          - os: macos-15
+          - os: macos-latest
             architecture: arm64
             platform_id: macosx_arm64
           - os: windows-latest
@@ -46,13 +46,13 @@ jobs:
             architecture: arm64
             platform_id: manylinux_aarch64
         exclude:
-          - os: macos-13
+          - os: macos-15-intel
             architecture: x86
-          - os: macos-13
+          - os: macos-15-intel
             architecture: arm64
-          - os: macos-15
+          - os: macos-latest
             architecture: x86
-          - os: macos-15
+          - os: macos-latest
             architecture: x64
           - os: ubuntu-latest
             architecture: x86
@@ -78,7 +78,7 @@ jobs:
           nuget-version: "latest"
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: ${{ matrix.python-version }}
           architecture: ${{ matrix.architecture }}
@@ -103,7 +103,7 @@ jobs:
       #===============================================#
       # wheels
       - name: Build wheels
-        uses: pypa/cibuildwheel@c923d83ad9c1bc00211c5041d0c3f73294ff88f6 # v3.1.4
+        uses: pypa/cibuildwheel@7c619efba910c04005a835b110b057fc28fd6e93 # v3.2.0
         with:
           output-dir: wheelhouse
         env:
@@ -173,7 +173,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: "3.9"
 
@@ -248,7 +248,7 @@ jobs:
       - uses: actions/checkout@ff7abcd0c3c05ccf6adc123a8cd1fd4fb30fb493 # v4.1.4
 
       - name: Set up Python 3.9
-        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: "3.9"
           architecture: "x64"
