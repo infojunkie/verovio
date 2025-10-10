@@ -98,20 +98,9 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     }
 
     const int count = (int)accids.size();
-    const int middle = (count / 2) + (count % 2);
-    // Zig-zag processing
-    for (int i = 0, j = count - 1; i < middle; ++i, --j) {
-        // top one - but skip if already adjusted (i.e. octaves)
+    for (int i = 0; i < count; ++i) {
         if (!m_adjustedAccids.contains(accids.at(i))) {
             this->AdjustAccidWithSpace(accids.at(i), alignmentReference, staffSize);
-        }
-
-        // Break with odd number of elements once the middle is reached
-        if (i == j) break;
-
-        // bottom one - but skip if already adjusted
-        if (!m_adjustedAccids.contains(accids.at(j))) {
-            this->AdjustAccidWithSpace(accids.at(j), alignmentReference, staffSize);
         }
     }
 
