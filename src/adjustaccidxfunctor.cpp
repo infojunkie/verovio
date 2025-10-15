@@ -98,10 +98,21 @@ FunctorCode AdjustAccidXFunctor::VisitAlignmentReference(AlignmentReference *ali
     }
 
     const int count = (int)accids.size();
-    for (int i = 0; i < count; ++i) {
+    // Zig-zag processing
+    for (int i = 0, j = count - 1; i < count; ++i) {
+        // top one - but skip if already adjusted (i.e. octaves)
         if (!m_adjustedAccids.contains(accids.at(i))) {
             this->AdjustAccidWithSpace(accids.at(i), alignmentReference, staffSize);
         }
+
+        // Don't zig-zag if the next accidental belongs to the same note as the current one
+        if (i < count - 1 && accids.at(i)->GetFirstAncestor(NOTE) == accids.at(i + 1)->GetFirstAncestor(NOTE)) continue;
+
+        // bottom one - but skip if already adjusted
+        if (!m_adjustedAccids.contains(accids.at(j))) {
+            this->AdjustAccidWithSpace(accids.at(j), alignmentReference, staffSize);
+        }
+        --j;
     }
 
     return FUNCTOR_SIBLINGS;
