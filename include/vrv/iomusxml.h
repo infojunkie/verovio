@@ -34,6 +34,7 @@ class Clef;
 class ControlElement;
 class Dir;
 class Dynam;
+class Expansion;
 class F;
 class Fermata;
 class Fb;
@@ -114,6 +115,8 @@ namespace musicxml {
     };
 
     struct EndingInfo {
+        EndingInfo() {}
+
         EndingInfo(const std::string &endingNumber, const std::string &endingType, const std::string &endingText)
         {
             m_endingNumber = endingNumber;
@@ -124,6 +127,19 @@ namespace musicxml {
         std::string m_endingNumber;
         std::string m_endingType;
         std::string m_endingText;
+    };
+
+    struct SectionInfo {
+        SectionInfo() {
+            m_classId = SECTION;
+        }
+        SectionInfo(EndingInfo endingInfo) {
+            m_classId = ENDING;
+            m_endingInfo = endingInfo;
+        }
+
+        ClassId m_classId;
+        EndingInfo m_endingInfo;
     };
 
     struct ClefChange {
@@ -370,10 +386,10 @@ private:
     ///@}
 
     /*
-     * @name Helper method to check whether an ending measure is already present in m_endingStack.
+     * @name Helper method to check whether a measure is already present in sections structure.
      */
     ///@{
-    bool NotInEndingStack(const Measure *measure) const;
+    bool MeasureInExistingSection(const Measure *measure) const;
     ///@}
 
     /*
@@ -567,11 +583,11 @@ private:
     std::vector<std::pair<BeamSpan *, std::pair<int, int>>> m_beamspanStack;
     std::vector<std::pair<BracketSpan *, musicxml::OpenSpanner>> m_bracketStack;
     std::vector<std::pair<Trill *, musicxml::OpenSpanner>> m_trillStack;
-    /* Current ending info for start/stop */
-    std::optional<musicxml::EndingInfo> m_currentEndingStart;
-    std::optional<musicxml::EndingInfo> m_currentEndingStop;
-    /* The stack of endings to be inserted at the end of XML import */
-    std::vector<std::pair<std::vector<Measure *>, musicxml::EndingInfo>> m_endingStack;
+    /* Current section/ending info for start/stop */
+    std::optional<musicxml::SectionInfo> m_sectionStart;
+    std::optional<musicxml::SectionInfo> m_sectionStop;
+    /* The list of sections/endings to be inserted at the end of XML import */
+    std::vector<std::pair<musicxml::SectionInfo, std::vector<Measure *>>> m_sections;
     /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */
     std::vector<std::pair<ControlElement *, musicxml::OpenDashes>> m_openDashesStack;
     /* The stacks for ControlElements */
@@ -599,6 +615,8 @@ private:
     std::map<data_PITCHNAME, std::vector<musicxml::AccidGes>> m_currentAccids;
     /* current key signature */
     KeySig *m_currentKeySig = NULL;
+    /* expansion */
+    Expansion *m_expansion = NULL;
 
 #endif // NO_MUSICXML_SUPPORT
 };
