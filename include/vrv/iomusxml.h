@@ -117,29 +117,53 @@ namespace musicxml {
     struct EndingInfo {
         EndingInfo() {}
 
-        EndingInfo(const std::string &endingNumber, const std::string &endingType, const std::string &endingText)
+        EndingInfo(const std::string &number, const std::string &type, const std::string &text)
         {
-            m_endingNumber = endingNumber;
-            m_endingType = endingType;
-            m_endingText = endingText;
+            m_number = number;
+            m_type = type;
+            m_text = text;
         }
 
-        std::string m_endingNumber;
-        std::string m_endingType;
-        std::string m_endingText;
+        std::string m_number;
+        std::string m_type;
+        std::string m_text;
+    };
+
+    struct RepeatInfo {
+        RepeatInfo() {
+            m_times = 1;
+            m_afterJump = false;
+        }
+
+        RepeatInfo(int times, bool afterJump) {
+            m_times = times;
+            m_afterJump = afterJump;
+        }
+
+        int m_times;
+        bool m_afterJump;
     };
 
     struct SectionInfo {
         SectionInfo() {
             m_classId = SECTION;
+            m_target = NULL;
         }
         SectionInfo(EndingInfo endingInfo) {
             m_classId = ENDING;
+            m_target = NULL;
             m_endingInfo = endingInfo;
+        }
+        SectionInfo(RepeatInfo repeatInfo) {
+            m_classId = SECTION;
+            m_target = NULL;
+            m_repeatInfo = repeatInfo;
         }
 
         ClassId m_classId;
+        Object *m_target;
         EndingInfo m_endingInfo;
+        RepeatInfo m_repeatInfo;
     };
 
     struct ClefChange {
@@ -386,10 +410,11 @@ private:
     ///@}
 
     /*
-     * @name Helper method to check whether a measure is already present in sections structure.
+     * @name Helper methods to work with sections and expansions.
      */
     ///@{
     bool MeasureInExistingSection(const Measure *measure) const;
+    void CreateExpansion(Section *section);
     ///@}
 
     /*
@@ -419,25 +444,25 @@ private:
      * @name Helper methods for rendering text elements
      */
     ///@{
-    ///@}
     std::string GetWordsOrDynamicsText(const pugi::xml_node node) const;
     void TextRendition(const pugi::xpath_node_set words, ControlElement *element) const;
     std::string StyleLabel(pugi::xml_node display);
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
+    ///@}
 
     /*
      * @name Helper methods for filling in space elements
      */
     ///@{
-    ///@}
     void FillSpace(Layer *layer, int dur);
+    ///@}
 
     /*
      * @name Helper method for generating additional IDs
      */
     ///@{
-    ///@}
     void GenerateID(pugi::xml_node node);
+    ///@}
 
     /*
      * @name Helper method for meterSigGrp. Separates beat/beat-type into MeterSig and adds them to the MeterSigGrp.
@@ -615,8 +640,6 @@ private:
     std::map<data_PITCHNAME, std::vector<musicxml::AccidGes>> m_currentAccids;
     /* current key signature */
     KeySig *m_currentKeySig = NULL;
-    /* expansion */
-    Expansion *m_expansion = NULL;
 
 #endif // NO_MUSICXML_SUPPORT
 };
