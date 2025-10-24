@@ -1176,7 +1176,10 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     CreateExpansion(section);
     m_sections.clear();
 
+    // finalize document
+    m_doc->ExpandExpansions();
     m_doc->ConvertToPageBasedDoc();
+    m_doc->ConvertMarkupDoc();
 
     // clean up stacks
     if (!m_beamspanStack.empty()) {

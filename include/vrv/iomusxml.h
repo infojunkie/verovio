@@ -34,7 +34,6 @@ class Clef;
 class ControlElement;
 class Dir;
 class Dynam;
-class Expansion;
 class F;
 class Fermata;
 class Fb;
