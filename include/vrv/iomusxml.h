@@ -144,45 +144,55 @@ namespace musicxml {
     };
 
     struct JumpInfo {
-        typedef enum { NONE=0, DALSEGNO, DACAPO, FINE } JUMPTYPE;
+        typedef enum { NONE=0, DALSEGNO, DACAPO, FINE, TOCODA } JUMPTYPE;
 
         JumpInfo() {
             m_jump = NONE;
         }
-        JumpInfo(const std::string &dalsegno) {
-            m_dalsegno = dalsegno;
-            m_jump = DALSEGNO;
+        JumpInfo(JUMPTYPE jump, const std::string &label, const std::vector<int> &times) {
+            m_label = label;
+            m_jump = jump;
+            m_times = times;
+        }
+        JumpInfo(JUMPTYPE jump, const std::vector<int> &times) {
+            m_jump = jump;
+            m_times = times;
         }
         JumpInfo(JUMPTYPE jump) {
             m_jump = jump;
         }
 
-        std::string m_dalsegno;
+        std::string m_label;
         JUMPTYPE m_jump;
+        std::vector<int> m_times;
     };
 
     struct SectionInfo {
         SectionInfo() {
             m_classId = SECTION;
             m_target = NULL;
+            m_visited = 0;
         }
         SectionInfo(EndingInfo endingInfo) {
             m_classId = ENDING;
             m_target = NULL;
             m_endingInfo = endingInfo;
+            m_visited = 0;
         }
         SectionInfo(RepeatInfo repeatInfo) {
             m_classId = SECTION;
             m_target = NULL;
             m_repeatInfo = repeatInfo;
+            m_visited = 0;
         }
 
         ClassId m_classId;
         Object *m_target;
-        std::string m_segno;
+        std::string m_label;
         EndingInfo m_endingInfo;
         RepeatInfo m_repeatInfo;
         JumpInfo m_jumpInfo;
+        int m_visited;
     };
 
     struct ClefChange {
