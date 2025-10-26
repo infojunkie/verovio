@@ -1249,7 +1249,7 @@ void MusicXmlInput::CreateExpansion(Section *section)
     section->InsertChild(expansion, 0);
 
     // iterate on sections
-    bool jumped = false;
+    bool jumpBack = false;
     auto iter = m_sections.begin();
     auto seciter = iter;
     auto enditer = iter;
@@ -1259,13 +1259,13 @@ void MusicXmlInput::CreateExpansion(Section *section)
         iter->first.m_visited++;
 
         // populate labels (segnos, codas) map
-        if (!jumped && !iter->first.m_label.empty()) {
+        if (iter->first.m_visited == 1 && !iter->first.m_label.empty()) {
             labels.insert({ iter->first.m_label, iter });
         }
 
         // handle section
         if (iter->first.m_classId == SECTION) {
-            int times = (jumped && !iter->first.m_repeatInfo.m_afterJump) ? 1 : iter->first.m_repeatInfo.m_times;
+            int times = (jumpBack && !iter->first.m_repeatInfo.m_afterJump) ? 1 : iter->first.m_repeatInfo.m_times;
             for (int t = 1; t <= times; ++t) {
                 std::string ref = "#" + iter->first.m_target->GetID();
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
@@ -1285,13 +1285,13 @@ void MusicXmlInput::CreateExpansion(Section *section)
                 enditer = iter++;
             }
 
-            // when jumped, keep only last ending
-            if (jumped) {
-                auto last = std::prev(endings.end());
-                endings.clear();
-                endings.insert(*last);
-                enditer = last->second;
-            }
+            // // when jumpBack, keep only last ending
+            // if (jumpBack) {
+            //     auto last = std::prev(endings.end());
+            //     endings.clear();
+            //     endings.insert(*last);
+            //     enditer = last->second;
+            // }
 
             // the map is automatically sorted by key (ending number), so just add them to expansion in the same order
             // skip section first time because it was already added in the SECTION block
@@ -1306,32 +1306,37 @@ void MusicXmlInput::CreateExpansion(Section *section)
         }
 
         // fine
-        if (jumped && enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::FINE) {
+        if (jumpBack && enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::FINE) {
             break;
         }
 
         // dacapo
-        if (enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DACAPO) {
-            if (enditer->first.m_jumpInfo.m_times.end() != std::find(
+        if (
+            enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DACAPO &&
+            enditer->first.m_jumpInfo.m_times.end() != std::find(
                 enditer->first.m_jumpInfo.m_times.begin(),
                 enditer->first.m_jumpInfo.m_times.end(),
-                enditer->first.m_visited)
-            ) {
-                iter = m_sections.begin();
-                jumped = true;
-            }
+                enditer->first.m_visited
+            )
+        ) {
+            iter = m_sections.begin();
+            jumpBack = true;
         }
 
         // dalsegno / tocoda
-        if (!enditer->first.m_jumpInfo.m_label.empty() && labels.count(enditer->first.m_jumpInfo.m_label) > 0) {
-            if (enditer->first.m_jumpInfo.m_times.end() != std::find(
+        if (
+            (
+                enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO ||
+                enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::TOCODA
+            ) &&
+            enditer->first.m_jumpInfo.m_times.end() != std::find(
                 enditer->first.m_jumpInfo.m_times.begin(),
                 enditer->first.m_jumpInfo.m_times.end(),
-                enditer->first.m_visited)
-            ) {
-                iter = labels.at(enditer->first.m_jumpInfo.m_label);
-                jumped = true;
-            }
+                enditer->first.m_visited
+            )
+        ) {
+            iter = labels.at(enditer->first.m_jumpInfo.m_label);
+            jumpBack = enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::DALSEGNO;
         }
     }
 }
@@ -3987,12 +3992,14 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     if (node.attribute("segno")) {
         if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
         m_sectionStart->m_label = node.attribute("segno").as_string();
+        if (m_sectionStart->m_label.empty()) m_sectionStart->m_label = "segno";
     }
 
     // coda
     if (node.attribute("coda")) {
         if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
         m_sectionStart->m_label = node.attribute("coda").as_string();
+        if (m_sectionStart->m_label.empty()) m_sectionStart->m_label = "coda";
     }
 
     // forward-repeat
@@ -4001,7 +4008,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     }
 
     // fine
-    if (HasAttributeWithValue(node, "fine", "yes")) {
+    if (node.attribute("fine")) {
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
         m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::FINE);
     }
@@ -4016,6 +4023,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     if (node.attribute("dalsegno")) {
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
         std::string label = node.attribute("dalsegno").as_string();
+        if (label.empty()) label = "segno";
         m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::DALSEGNO, label, parseInts(node.attribute("time-only").as_string("1")));
     }
 
@@ -4023,6 +4031,7 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
     if (node.attribute("tocoda")) {
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
         std::string label = node.attribute("tocoda").as_string();
+        if (label.empty()) label = "coda";
         m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::TOCODA, label, parseInts(node.attribute("time-only").as_string("2")));
     }
 }
