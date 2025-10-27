@@ -144,7 +144,7 @@ namespace musicxml {
     };
 
     struct JumpInfo {
-        typedef enum { NONE=0, DALSEGNO, DACAPO, FINE, TOCODA } JUMPTYPE;
+        typedef enum { NONE=0, DALSEGNO, DACAPO, TOCODA } JUMPTYPE;
 
         JumpInfo() {
             m_jump = NONE;
@@ -165,6 +165,17 @@ namespace musicxml {
         std::string m_label;
         JUMPTYPE m_jump;
         std::vector<int> m_times;
+    };
+
+    struct FineInfo {
+        FineInfo() {
+            m_fine = false;
+        }
+        FineInfo(bool fine) {
+            m_fine = fine;
+        }
+
+        bool m_fine;
     };
 
     struct SectionInfo {
@@ -192,6 +203,7 @@ namespace musicxml {
         EndingInfo m_endingInfo;
         RepeatInfo m_repeatInfo;
         JumpInfo m_jumpInfo;
+        FineInfo m_fineInfo;
         int m_visited;
     };
 
@@ -641,6 +653,7 @@ private:
     std::optional<musicxml::SectionInfo> m_sectionStart;
     std::optional<musicxml::SectionInfo> m_sectionStop;
     std::optional<musicxml::JumpInfo> m_jumpInfo;
+    std::optional<musicxml::FineInfo> m_fineInfo;
     /* The list of sections/endings to be inserted at the end of XML import */
     std::vector<std::pair<musicxml::SectionInfo, std::vector<Measure *>>> m_sections;
     /* The stack of open dashes (direction-type) containing *ControlElement, OpenDashes */

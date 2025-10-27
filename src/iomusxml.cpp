@@ -407,9 +407,12 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
         if (!m_sections.empty()) {
             m_sections.back().second.push_back(contentMeasure);
         }
-        // jump info
+        // jump and fine info
         if (m_jumpInfo && !m_sections.empty()) {
             m_sections.back().first.m_jumpInfo = *m_jumpInfo;
+        }
+        if (m_fineInfo && !m_sections.empty()) {
+            m_sections.back().first.m_fineInfo = *m_fineInfo;
         }
         // closing a section: open a new one
         if (m_sectionStop && !m_sections.empty()) {
@@ -425,6 +428,7 @@ void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
     m_sectionStart.reset();
     m_sectionStop.reset();
     m_jumpInfo.reset();
+    m_fineInfo.reset();
 }
 
 void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element, int duration)
@@ -1248,20 +1252,21 @@ void MusicXmlInput::CreateExpansion(Section *section)
     expansion->SetID("expansion-default");
     section->InsertChild(expansion, 0);
 
-    // iterate on sections
+    // iterate on sections to create expansion
+    // prepopulate the labels map because there are forward jumps (tocoda)
     bool jumpBack = false;
     auto iter = m_sections.begin();
     auto seciter = iter;
     auto enditer = iter;
     std::map<std::string, decltype(iter)> labels;
+    for (auto it = m_sections.begin(); it != m_sections.end(); ++it) {
+        if (!it->first.m_label.empty()) {
+            labels.insert({ it->first.m_label, it });
+        }
+    }
     while (iter != m_sections.end()) {
         // increment visited count
         iter->first.m_visited++;
-
-        // populate labels (segnos, codas) map
-        if (iter->first.m_visited == 1 && !iter->first.m_label.empty()) {
-            labels.insert({ iter->first.m_label, iter });
-        }
 
         // handle section
         if (iter->first.m_classId == SECTION) {
@@ -1285,13 +1290,13 @@ void MusicXmlInput::CreateExpansion(Section *section)
                 enditer = iter++;
             }
 
-            // // when jumpBack, keep only last ending
-            // if (jumpBack) {
-            //     auto last = std::prev(endings.end());
-            //     endings.clear();
-            //     endings.insert(*last);
-            //     enditer = last->second;
-            // }
+            // when jumping back, keep only last ending
+            if (jumpBack) {
+                auto last = std::prev(endings.end());
+                endings.clear();
+                endings.insert(*last);
+                enditer = last->second;
+            }
 
             // the map is automatically sorted by key (ending number), so just add them to expansion in the same order
             // skip section first time because it was already added in the SECTION block
@@ -1306,7 +1311,7 @@ void MusicXmlInput::CreateExpansion(Section *section)
         }
 
         // fine
-        if (jumpBack && enditer->first.m_jumpInfo.m_jump == musicxml::JumpInfo::FINE) {
+        if (jumpBack && enditer->first.m_fineInfo.m_fine) {
             break;
         }
 
@@ -4007,12 +4012,6 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
         if (!m_sectionStart) m_sectionStart = musicxml::SectionInfo();
     }
 
-    // fine
-    if (node.attribute("fine")) {
-        if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
-        m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::FINE);
-    }
-
     // dacapo
     if (HasAttributeWithValue(node, "dacapo", "yes")) {
         if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
@@ -4033,6 +4032,12 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure)
         std::string label = node.attribute("tocoda").as_string();
         if (label.empty()) label = "coda";
         m_jumpInfo = musicxml::JumpInfo(musicxml::JumpInfo::TOCODA, label, parseInts(node.attribute("time-only").as_string("2")));
+    }
+
+    // fine
+    if (node.attribute("fine")) {
+        if (!m_sectionStop) m_sectionStop = musicxml::SectionInfo();
+        m_fineInfo = musicxml::FineInfo(true);
     }
 }
 
