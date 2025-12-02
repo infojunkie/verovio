@@ -321,17 +321,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         int x2 = drawingX2;
 
         this->SetOffsetStaffSize(element, staffSize);
-
-        if (spanningType == SPANNING_START_END) {
-            this->CalcOffsetX(dc, x1);
-            this->CalcOffsetX(dc, x2);
-        }
-        else if (spanningType == SPANNING_START) {
-            this->CalcOffsetX(dc, x1);
-        }
-        else if (spanningType == SPANNING_END) {
-            this->CalcOffsetX(dc, x2);
-        }
+        this->CalcOffsetSpanningStartX(dc, x1, spanningType);
+        this->CalcOffsetSpanningEndX(dc, x2, spanningType);
 
         // TimeSpanning elements are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement()) {
@@ -735,8 +726,7 @@ void View::DrawHairpin(
     // Now swap start/end for dim.
     if (form == hairpinLog_FORM_dim) std::swap(startY, endY);
 
-    int y = hairpin->GetDrawingY();
-    this->CalcOffsetY(dc, y);
+    int y1 = hairpin->GetDrawingY();
 
     // Improve alignment with dynamics
     if (hairpin->GetPlace() != STAFFREL_within) {
@@ -744,8 +734,13 @@ void View::DrawHairpin(
         if (hairpin->GetPlace() != STAFFREL_between) {
             shiftY += unit;
         }
-        y += shiftY;
+        y1 += shiftY;
     }
+
+    this->CalcOffsetY(dc, y1);
+    int y2 = y1;
+    this->CalcOffsetSpanningStartY(dc, y1, spanningType);
+    this->CalcOffsetSpanningEndY(dc, y2, spanningType);
 
     /************** draw it **************/
 
@@ -771,28 +766,28 @@ void View::DrawHairpin(
 
     if ((startY == 0) && !niente) {
         Point p[3];
-        p[0] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y - endY / 2) };
-        p[1] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y) };
-        p[2] = { p[0].x, this->ToDeviceContextY(y + endY / 2) };
+        p[0] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2 - endY / 2) };
+        p[1] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y1) };
+        p[2] = { p[0].x, this->ToDeviceContextY(y2 + endY / 2) };
         dc->DrawPolyline(3, p);
     }
     else if ((endY == 0) && !niente) {
         Point p[3];
-        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y - startY / 2) };
-        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y) };
-        p[2] = { p[0].x, this->ToDeviceContextY(y + startY / 2) };
+        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2) };
+        p[2] = { p[0].x, this->ToDeviceContextY(y1 + startY / 2) };
         dc->DrawPolyline(3, p);
     }
     else {
         if (niente) {
             dc->SetBrush(0.0);
             if (startY == 0) {
-                dc->DrawCircle(this->ToDeviceContextX(x1), this->ToDeviceContextY(y), unit / 2);
+                dc->DrawCircle(this->ToDeviceContextX(x1), this->ToDeviceContextY(y1), unit / 2);
                 startY = unit * endY / (x2 - x1) / 2;
                 x1 += unit / 2;
             }
             else if (endY == 0) {
-                dc->DrawCircle(this->ToDeviceContextX(x2), this->ToDeviceContextY(y), unit / 2);
+                dc->DrawCircle(this->ToDeviceContextX(x2), this->ToDeviceContextY(y2), unit / 2);
                 endY = unit * startY / (x2 - x1) / 2;
                 x2 -= unit / 2;
             }
@@ -800,11 +795,11 @@ void View::DrawHairpin(
         }
 
         Point p[2];
-        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y - startY / 2) };
-        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y - endY / 2) };
+        p[0] = { this->ToDeviceContextX(x1), this->ToDeviceContextY(y1 - startY / 2) };
+        p[1] = { this->ToDeviceContextX(x2), this->ToDeviceContextY(y2 - endY / 2) };
         dc->DrawPolyline(2, p);
-        p[0].y = this->ToDeviceContextY(y + startY / 2);
-        p[1].y = this->ToDeviceContextY(y + endY / 2);
+        p[0].y = this->ToDeviceContextY(y1 + startY / 2);
+        p[1].y = this->ToDeviceContextY(y2 + endY / 2);
         dc->DrawPolyline(2, p);
     }
     dc->ResetPen();
@@ -2375,6 +2370,9 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     // set mordent glyph
     const int code = mordent->GetMordentGlyph();
 
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = mordent->GetEnclosingGlyphs();
+
     std::u32string str;
     str.push_back(code);
 
@@ -2479,11 +2477,25 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             this->DrawSmuflString(dc, accidX, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
 
+        // hardcoded vertical offset because of the slash
+        const int yCorrEncl = m_doc->GetGlyphHeight(SMUFL_E56C_ornamentShortTrill, staffSize, false) / 2;
+
+        if (enclosingFront) {
+            const int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
+            this->DrawSmuflCode(dc, x - xCorrEncl, y + yCorrEncl, enclosingFront, staffSize, false);
+        }
+
         if (symbolDef) {
             this->DrawSymbolDef(dc, mordent, symbolDef, x, y, staffSize, false);
         }
         else {
             this->DrawSmuflString(dc, x, y, str, HORIZONTALALIGNMENT_left, staffSize);
+        }
+
+        if (enclosingBack) {
+            const int xCorrEncl = mordentWidth + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
+            this->DrawSmuflCode(dc, x + xCorrEncl, y + yCorrEncl, enclosingBack, staffSize, false);
         }
 
         dc->ResetFont();
@@ -2841,12 +2853,11 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, false));
 
         if (enclosingFront) {
-            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingFront, staffSize, false)
-                + m_doc->GetDrawingUnit(staffSize) / 4;
+            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
             this->DrawSmuflCode(dc, x - xCorrEncl, y + trillHeight / 2, enclosingFront, staffSize, false);
         }
 
-        // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
+        // Upper and lower accidentals are currently exclusive, but should both be allowed at the same time.
         if (trill->HasAccidlower()) {
             int accidXShift = (alignment == HORIZONTALALIGNMENT_center) ? 0 : trillWidth / 2;
             char32_t accid = Accid::GetAccidGlyph(trill->GetAccidlower());
@@ -2875,7 +2886,8 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         }
 
         if (enclosingBack) {
-            const int xCorrEncl = trillWidth / 2 + m_doc->GetDrawingUnit(staffSize) / 4;
+            const int xCorrEncl = trillWidth / 2 + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
             this->DrawSmuflCode(dc, x + xCorrEncl, y + trillHeight / 2, enclosingBack, staffSize, false);
         }
 
@@ -2916,6 +2928,9 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
 
     // set norm as default
     int code = turn->GetTurnGlyph();
+
+    char32_t enclosingFront, enclosingBack;
+    std::tie(enclosingFront, enclosingBack) = turn->GetEnclosingGlyphs();
 
     data_HORIZONTALALIGNMENT alignment = HORIZONTALALIGNMENT_center;
     // center the turn only with @startid
@@ -2966,11 +2981,24 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
                 dc, x + accidXShift, accidY, accidStr, HORIZONTALALIGNMENT_center, staffSize / 2, false);
         }
 
+        if (enclosingFront) {
+            int xCorrEncl = m_doc->GetGlyphWidth(enclosingFront, staffSize, false);
+            if (!turn->GetStart()->Is(TIMESTAMP_ATTR)) xCorrEncl += turnWidth / 2;
+            this->DrawSmuflCode(dc, x - xCorrEncl, y + turnHeight / 2, enclosingFront, staffSize, false);
+        }
+
         if (symbolDef) {
             this->DrawSymbolDef(dc, turn, symbolDef, x, y, staffSize, false, alignment);
         }
         else {
             this->DrawSmuflString(dc, x, y, str, alignment, staffSize);
+        }
+
+        if (enclosingBack) {
+            int xCorrEncl = turnWidth + m_doc->GetGlyphWidth(enclosingBack, staffSize, false)
+                - m_doc->GetGlyphAdvX(enclosingBack, staffSize, false);
+            if (!turn->GetStart()->Is(TIMESTAMP_ATTR)) xCorrEncl -= turnWidth / 2;
+            this->DrawSmuflCode(dc, x + xCorrEncl, y + turnHeight / 2, enclosingBack, staffSize, false);
         }
 
         dc->ResetFont();
