@@ -179,22 +179,25 @@ namespace musicxml {
     };
 
     struct SectionInfo {
-        SectionInfo() {
+        SectionInfo(bool repeatStart = false) {
+            m_visited = 0;
             m_classId = SECTION;
             m_target = NULL;
-            m_visited = 0;
+            m_repeatStart = repeatStart;
         }
         SectionInfo(EndingInfo endingInfo) {
+            m_visited = 0;
             m_classId = ENDING;
             m_target = NULL;
             m_endingInfo = endingInfo;
-            m_visited = 0;
+            m_repeatStart = false;
         }
         SectionInfo(RepeatInfo repeatInfo) {
+            m_visited = 0;
             m_classId = SECTION;
             m_target = NULL;
             m_repeatInfo = repeatInfo;
-            m_visited = 0;
+            m_repeatStart = false;
         }
 
         ClassId m_classId;
@@ -202,6 +205,7 @@ namespace musicxml {
         std::string m_label;
         EndingInfo m_endingInfo;
         RepeatInfo m_repeatInfo;
+        bool m_repeatStart;
         JumpInfo m_jumpInfo;
         FineInfo m_fineInfo;
         int m_visited;

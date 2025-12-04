@@ -1256,6 +1256,7 @@ void MusicXmlInput::CreateExpansion(Section *section)
     // prepopulate the labels map because there are forward jumps (tocoda)
     bool jumpBack = false;
     auto iter = m_sections.begin();
+    auto rptiter = iter;
     auto seciter = iter;
     auto enditer = iter;
     std::map<std::string, decltype(iter)> labels;
@@ -1268,12 +1269,22 @@ void MusicXmlInput::CreateExpansion(Section *section)
         // increment visited count
         iter->first.m_visited++;
 
+        // remember this repeat start
+        if (iter->first.m_repeatStart) rptiter = iter;
+
         // handle section
         if (iter->first.m_classId == SECTION) {
+            // add the section
+            std::string ref = "#" + iter->first.m_target->GetID();
+            expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+
+            // repeat the sections, beginning with the repeat start
             int times = (jumpBack && !iter->first.m_repeatInfo.m_afterJump) ? 1 : iter->first.m_repeatInfo.m_times;
-            for (int t = 1; t <= times; ++t) {
-                std::string ref = "#" + iter->first.m_target->GetID();
-                expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+            for (int t = 2; t <= times; ++t) {
+                for (auto it = rptiter; it != std::next(iter); ++it) {
+                    std::string ref = "#" + it->first.m_target->GetID();
+                    expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                }
             }
 
             // remember last section
@@ -1302,8 +1313,10 @@ void MusicXmlInput::CreateExpansion(Section *section)
             // skip section first time because it was already added in the SECTION block
             for (auto ending = endings.begin(); ending != endings.end(); ++ending) {
                 if (ending != endings.begin()) {
-                    std::string secref = "#" + seciter->first.m_target->GetID();
-                    expansion->GetPlistInterface()->AddRefAllowDuplicate(secref);
+                    for (auto it = rptiter; it != std::next(seciter); ++it) {
+                        std::string ref = "#" + it->first.m_target->GetID();
+                        expansion->GetPlistInterface()->AddRefAllowDuplicate(ref);
+                    }
                 }
                 std::string endref = "#" + ending->second->first.m_target->GetID();
                 expansion->GetPlistInterface()->AddRefAllowDuplicate(endref);
@@ -2090,7 +2103,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, c
 
     // start or end section
     if (measure->GetLeft() == BARRENDITION_rptstart) {
-        m_sectionStart = musicxml::SectionInfo();
+        m_sectionStart = musicxml::SectionInfo(true);
     }
     if (measure->GetRight() == BARRENDITION_rptend) {
         m_sectionStop = musicxml::SectionInfo(musicxml::RepeatInfo(repeatTimes, repeatAfterJump));
