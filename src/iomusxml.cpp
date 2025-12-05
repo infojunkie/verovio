@@ -1935,9 +1935,6 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         if (IsElement(child, "attributes")) {
             this->ReadMusicXmlAttributes(child, section, measure, measureNum);
         }
-        else if (IsElement(child, "sound")) {
-            this->ReadMusicXmlSound(child, measure);
-        }
         else if (IsElement(child, "backup")) {
             this->ReadMusicXmlBackup(child, measure, measureNum);
         }
@@ -1949,6 +1946,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         }
         else if (IsElement(child, "sound")) {
             this->ReadMusicXmlSound(child, measure, section);
+        }
+        else if (IsElement(child, "sound")) {
+            this->ReadMusicXmlSound(child, measure);
         }
         else if (IsElement(child, "figured-bass")) {
             this->ReadMusicXmlFigures(child, measure, measureNum);
