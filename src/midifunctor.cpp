@@ -978,11 +978,6 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
             case TEMPERAMENT_just: midiEvent.makeTemperamentBad(100.0, referencePitchClass); break;
             case TEMPERAMENT_mean: midiEvent.makeTemperamentMeantone(referencePitchClass); break;
             case TEMPERAMENT_pythagorean: midiEvent.makeTemperamentPythagorean(referencePitchClass); break;
-            case TEMPERAMENT_MAX:
-                if (scoreDef->GetTuneCustom().IsValid()) {
-                    midiEvent.makeTuningCustom(scoreDef->GetTuneCustom().GetTuning(), program);
-                }
-                break;
             default: break;
         }
         m_midiFile->addEvent(m_midiTrack, midiEvent);
