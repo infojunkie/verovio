@@ -3153,8 +3153,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                         }
                     }
                     catch (std::out_of_range &e) {
-                        std::cout << "OUT OF RANGE: " << note->GetPname() << std::endl;
-                        // unknown note, do nothing
+                        LogWarning("MusicXML import: Unexpected pitch %d", note->GetPname());
                     }
                 }
                 else {

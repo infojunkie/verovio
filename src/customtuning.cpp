@@ -82,7 +82,6 @@ void CustomTuning::CreateNoteMapping(bool useMusicXmlAccidentals)
                 }
                 accid_start = accid_names.suffix().first;
             }
-            std::cout << mei << std::endl;
             m_noteMap.insert({ mei, note });
 
             // get next match
@@ -153,14 +152,12 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
                 glyph = GetAccidGlyph(att->AccidentalGesturalToStr(accid->GetAccidGes()), false);
                 if (glyph) glyphName = GetGlyphName(glyph);
             }
-            std::cout << "Glyph: " << glyphName << std::endl;
             if (!glyphName.empty()) {
                 if (accs++) noteName += "+";
                 noteName += glyphName;
             }
         }
     }
-    std::cout << noteName << std::endl;
     int oct = note->GetOct() + octaveShift;
     if (note->HasOctGes()) oct = note->GetOctGes();
 
