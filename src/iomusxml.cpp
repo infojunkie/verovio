@@ -3137,8 +3137,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                 note->SetOct(octaveNum);
             }
 
-            // adjust gestural accidental (including glyph) based on carried-over accidentals
-            // or update the carried-over accidentals with current gestural accidental value.
+            // adjust accidental (including glyph) based on carried-over accidentals
+            // or update the carried-over accidentals with current accidental value.
             if (note->HasPname()) {
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
                 if (!accids.size()) {
@@ -3147,12 +3147,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                             Accid *accid = new Accid();
                             note->AddChild(accid);
                             accid->IsAttribute(true);
-                            accid->SetAccid(ACCIDENTAL_WRITTEN_n/*current.m_accid*/);
+                            accid->SetAccid(current.m_accid);
                             accid->SetGlyphName(current.m_glyphName);
                             accid->SetGlyphAuth(current.m_glyphAuth);
                         }
                     }
                     catch (std::out_of_range &e) {
+                        std::cout << "OUT OF RANGE: " << note->GetPname() << std::endl;
                         // unknown note, do nothing
                     }
                 }
@@ -4407,7 +4408,7 @@ void MusicXmlInput::ResetAccidental(const KeySig *keySig)
 {
     // inspired by KeySig::FillMap() but without the octave repetitions
     m_currentAccids.clear();
-    for (int i = PITCHNAME_c; i <= PITCHNAME_g; i++) {
+    for (int i = PITCHNAME_c; i <= PITCHNAME_b; i++) {
         m_currentAccids[static_cast<data_PITCHNAME>(i)] = { musicxml::Accidental() };
     }
 

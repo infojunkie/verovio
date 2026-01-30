@@ -958,6 +958,7 @@ FunctorCode GenerateMIDIFunctor::VisitScoreDef(const ScoreDef *scoreDef)
     }
     // set custom tuning if available
     if (scoreDef->GetTuneCustom().IsValid()) {
+        std::cout << "TUNING" << std::endl;
         const int program = m_instrDef && m_instrDef->HasMidiInstrnum() ? m_instrDef->GetMidiInstrnum() : 0;
         const Tunings::Tuning &tuneCustom = scoreDef->GetTuneCustom().GetTuning();
         std::vector<std::pair<int, double>> mapping;
@@ -1126,6 +1127,7 @@ void GenerateMIDIFunctor::HandleOctave(const LayerElement *layerElement)
 int GenerateMIDIFunctor::GetMIDIPitch(const Note *note)
 {
     if (m_scoreDef && m_scoreDef->GetTuneCustom().IsValid()) {
+        std::cout << "GET MIDI PITCH" << std::endl;
         return m_scoreDef->GetTuneCustom().GetMIDIPitch(note, m_transSemi, m_octaveShift);
     }
     return note->GetMIDIPitch(m_transSemi, m_octaveShift);
