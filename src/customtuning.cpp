@@ -30,14 +30,14 @@ CustomTuning::CustomTuning(const std::string &tuningDef, Doc *doc, bool useMusic
         CreateNoteMapping(useMusicXmlAccidentals);
     }
     catch (Tunings::TuningError &e) {
-        LogError("Invalid tuning definition: %s", e.what());
+        LogError("Custom Tuning: Invalid tuning definition: %s", e.what());
     }
 }
 
 /**
  * Map the tuning note names to MEI notes.
  *
- * - Convert tuning accidentals from MusicXML or MEI and keep SMuFL accidentals as-is
+ * - Convert accidentals from MusicXML or MEI to SMuFL accidentals
  * - Detect enharmonics separated by `/`
  * - Detect multiple accidentals separated by `+`
  */
@@ -77,8 +77,8 @@ void CustomTuning::CreateNoteMapping(bool useMusicXmlAccidentals)
                     }
                 }
                 if (!valid) {
-                    LogError("Tuning accidental \"%s\" is neither a %s accidental nor a SMuFL glyph", accid.c_str(),
-                        useMusicXmlAccidentals ? "MusicXML" : "MEI");
+                    LogError("Custom Tuning: Tuning accidental \"%s\" is neither a %s accidental nor a SMuFL glyph",
+                        accid.c_str(), useMusicXmlAccidentals ? "MusicXML" : "MEI");
                 }
                 accid_start = accid_names.suffix().first;
             }
@@ -107,13 +107,14 @@ char32_t CustomTuning::GetAccidGlyph(std::string accid, bool useMusicXmlAccident
 /**
  * Get a SMuFL glyph name.
  */
-std::string CustomTuning::GetGlyphName(char32_t accidental) const {
+std::string CustomTuning::GetGlyphName(char32_t accidental) const
+{
     assert(m_doc);
     const Glyph *glyph = m_doc->GetResources().GetGlyph(accidental);
     if (glyph) {
         return glyph->GetCodeStr();
     }
-    LogError("SMuFL glyph U+%04X not found in glyph table", accidental);
+    LogError("Custom Tuning: SMuFL glyph U+%04X not found in glyph table", accidental);
     return "";
 }
 
@@ -172,10 +173,10 @@ int CustomTuning::GetMIDIPitch(const Note *note, const int shift, const int octa
         return m_tuning.midiNoteForNoteName(m_noteMap.at(noteName), oct);
     }
     catch (Tunings::TuningError &e) {
-        LogError("Error mapping note to tuning: %s", e.what());
+        LogError("Custom Tuning: Error mapping note to tuning: %s", e.what());
     }
     catch (std::out_of_range &e) {
-        LogError("Error mapping note to tuning: %s not mapped.", noteName.c_str());
+        LogError("Custom Tuning: Error mapping note to tuning: %s not mapped.", noteName.c_str());
     }
     return note->GetMIDIPitch(shift, octaveShift);
 }
