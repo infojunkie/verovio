@@ -81,6 +81,8 @@ void CustomTuning::CreateGlyphMapping(Doc *doc)
  */
 void CustomTuning::CreateNoteMapping(bool useMusicXmlAccidentals)
 {
+    assert(m_doc);
+
     m_noteMap.clear();
     for (const auto &note : m_tuning.notationMapping.names) {
         std::smatch note_names;
