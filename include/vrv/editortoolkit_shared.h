@@ -56,6 +56,7 @@ protected:
     bool ParseSetAction(jsonxx::Object param, std::string &elementId, std::string &attribute, std::string &value);
     ///@}
 
+    void SetEditInfo();
     void PrepareUndo();
     std::string GetCurrentState();
     bool ReloadState(const std::string &data);

@@ -58,6 +58,8 @@ EditorToolkitShared::EditorToolkitShared(Doc *doc, View *view) : EditorToolkit(d
     m_scoreContext = NULL;
     m_sectionContext = NULL;
     m_currentContext = NULL;
+
+    this->SetEditInfo();
 }
 
 EditorToolkitShared::~EditorToolkitShared()
@@ -99,10 +101,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         m_doc->ScoreDefSetCurrentDoc(true);
         m_doc->RefreshLayout();
         m_undoPrepared = false;
-        m_editInfo.reset();
-        m_editInfo.import("chainedId", m_chainedId);
-        m_editInfo.import("canUndo", this->CanUndo());
-        m_editInfo.import("canRedo", this->CanRedo());
+        this->SetEditInfo();
         return true;
     }
 
@@ -118,10 +117,7 @@ bool EditorToolkitShared::ParseEditorAction(const std::string &json_editorAction
         m_doc->PrepareData();
         m_doc->ScoreDefSetCurrentDoc(true);
         m_undoPrepared = false;
-        m_editInfo.reset();
-        m_editInfo.import("chainedId", m_chainedId);
-        m_editInfo.import("canUndo", this->CanUndo());
-        m_editInfo.import("canRedo", this->CanRedo());
+        this->SetEditInfo();
         return true;
     }
 
@@ -316,6 +312,15 @@ void EditorToolkitShared::PrepareUndo()
     TrimUndoMemory();
     // Set the flag
     m_undoPrepared = true;
+}
+
+void EditorToolkitShared::SetEditInfo()
+{
+    m_editInfo.reset();
+    m_editInfo.import("chainedId", m_chainedId);
+    m_editInfo.import("canUndo", this->CanUndo());
+    m_editInfo.import("canRedo", this->CanRedo());
+    m_editInfo.import("isMensuralMusicOnly", m_doc->IsMensuralMusicOnly());
 }
 
 std::string EditorToolkitShared::GetCurrentState()
