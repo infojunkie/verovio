@@ -75,7 +75,6 @@ public:
     //
 
 private:
-    const Doc *m_doc;
     Tunings::Tuning m_tuning;
     std::map<std::string, std::string> m_noteMap;
 
