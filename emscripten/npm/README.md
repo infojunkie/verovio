@@ -5,62 +5,30 @@ Verovio is a fast, portable and lightweight library for engraving [Music Encodin
 
 See it running in the [browser](https://blog.karimratib.me/demos/musicxml/) and check out the [tutorial](http://www.verovio.org/tutorial.xhtml) for its web integration and for enabling user interaction.
 
+## This fork
+
+This fork is about adding full support for ["music-i18n" (music internationalization)](https://blog.karimratib.me/2018/01/05/music-l10n.html) to Verovio. This includes:
+
+- Supports all SMuFL accidental glyphs. Not all bundled fonts support these glyphs, so make sure to use Bravura.
+- Fixes MIDI SysEx export which is [broken on the main trunk](https://github.com/rism-digital/verovio/issues/4145).
+- Supports [MEI temperaments](https://music-encoding.org/guidelines/v5/data-types/data.TEMPERAMENT.html) for MusicXML via the element [`sound/play/other-play[@type = "tuning-mei"]`](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/other-play/)
+- Supports full microtonality via [Ableton ASCL tunings](https://help.ableton.com/hc/en-us/articles/10998372840220-ASCL-Specification) for both MEI (via option `tuningFile`) and MusicXML (via both option `tuningFile` and MusicXML element [`sound/play/other-play[@type = "tuning-ableton"]`](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/other-play/)).
+
 ## Basic usage
 
-```js
-const verovio = require('verovio');
-const fs = require('fs');
-
-/* Wait for verovio to load */
-verovio.module.onRuntimeInitialized = function ()
-{
-   // create the toolkit instance
-   const vrvToolkit = new verovio.toolkit();
-   // read the MEI file
-   mei = fs.readFileSync('hello.mei');
-   // load the MEI data as string into the toolkit
-   vrvToolkit.loadData(mei.toString());
-   // render the fist page as SVG
-   svg = vrvToolkit.renderToSVG(1, {});
-   // save the SVG into a file
-   fs.writeFileSync('hello.svg', svg);
-}
-```
-
-## Usage with ESM
-
-This package also provides an ESM version which can be used with a modularized build of the Verovio module. Use `.mjs` as file extension when using this directly in Node.js or set `"type": "module"` in your `package.json`.
+The recommended usage of the package is with ESM. Use `.mjs` as file extension when using this directly in Node.js or set `"type": "module"` in your `package.json`.
 
 ```js
 import createVerovioModule from 'verovio/wasm';
 import { VerovioToolkit } from 'verovio/esm';
-import fs from 'node:fs';
 
-createVerovioModule().then(VerovioModule => {
-   const verovioToolkit = new VerovioToolkit(VerovioModule);
-   const score = fs.readFileSync('hello.mei').toString();
-   verovioToolkit.loadData(score);
-   const data = verovioToolkit.renderToSVG(1);
-   console.log(data);
+const VerovioModule = await createVerovioModule();
+const vrv = new VerovioToolkit(VerovioModule);
+vrv.setOptions({
+   tuningFile: await (await fetch('/path/to/tuning.ascl')).text(),
+   font: 'Bravura',
 });
+vrv.loadData(await (await fetch('/path/to/score.mei')).text());
+const svg = vrv.renderToSVG();
+const midi = vrv.renderToMIDI();
 ```
-
-This is the recommended way to use Verovio when creating a website or web app with bundlers like webpack or Vite or when using JavaScript frameworks like React or Vue.js.
-
-## Usage with CommonJS
-
-Alternatively this package also exports a version compatible with CommonJS
-
-```js
-const createVerovioModule = require('verovio/wasm');
-const { VerovioToolkit } = require('verovio/esm');
-```
-
-## Humdrum support
-
-Since version 3.11.0 the npm package provides an additional module with Humdrum support:
-
-```js
-import createVerovioModule from 'verovio/wasm-hum';
-```
-
