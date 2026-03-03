@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1">
+   <meiHead xml:id="m1pts1xj">
+      <fileDesc xml:id="f1w1js6v">
+         <titleStmt xml:id="tx0eea5">
+            <title>Untitled score</title>
+            <respStmt>
+               <persName role="composer">Composer / arranger</persName>
+            </respStmt>
+         </titleStmt>
+         <pubStmt xml:id="p1vosk2f">
+            <date isodate="2026-02-01" type="encoding-date">2026-02-01</date>
+         </pubStmt>
+      </fileDesc>
+      <encodingDesc xml:id="e1hipaeh">
+         <appInfo xml:id="air3bz9">
+            <application xml:id="ah6kkt1" isodate="2026-02-08T19:14:15" version="6.1.0-dev-91cbb00">
+               <name xml:id="n1w0dt8q">Verovio</name>
+               <p xml:id="p178k9i5">Transcoded from MusicXML</p>
+            </application>
+         </appInfo>
+      </encodingDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv xml:id="a1ns5bua">
+            <score xml:id="blkhyh5">
+               <scoreDef xml:id="c6yfu7z">
+                  <pgHead xml:id="gzob3zt" func="first">
+                     <rend xml:id="e1yy3n65" halign="center" valign="top">Key and accidentals</rend>
+                     <rend xml:id="h17sj151" halign="center" valign="top">Simple accidentals</rend>
+                  </pgHead>
+                  <staffGrp xml:id="j1f949ta">
+                     <staffDef xml:id="P1" n="1" lines="5" ppq="1">
+                        <label xml:id="ke1yzzb">Piano</label>
+                        <labelAbbr xml:id="mcyu79y">Pno.</labelAbbr>
+                        <instrDef xml:id="og48dnn" midi.channel="0" midi.instrnum="0" midi.volume="78%" />
+                        <clef xml:id="xzlou" shape="G" line="2" />
+                        <keySig xml:id="y29ipbt" sig="0" />
+                        <meterSig xml:id="zx6ceh5" count="4" unit="4" />
+                     </staffDef>
+                  </staffGrp>
+               </scoreDef>
+               <section xml:id="dtc8g7x">
+                  <expansion plist="#wup5nuy" xml:id="x1699xo6" />
+                  <section xml:id="wup5nuy">
+                     <measure xml:id="a1iceipe" n="1">
+                        <staff xml:id="jdicnwp" n="1">
+                           <layer xml:id="k1vpius6" n="1">
+                              <note xml:id="lq89rxb" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="m1sxzjp4" />
+                              </note>
+                              <note xml:id="n16kbka0" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="o1dzlmoh" accid="s" accid.ges="s" />
+                              </note>
+                              <note xml:id="pq3yfh6" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="q1600wi1" accid.ges="s" glyph.auth="smufl" glyph.name="accidentalSharp" />
+                              </note>
+                              <note xml:id="rhgozy6" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="s1w71o2k" accid="n" accid.ges="n" />
+                              </note>
+                           </layer>
+                        </staff>
+                     </measure>
+                     <measure xml:id="t1whp7xh" n="2">
+                        <staff xml:id="c7maglf" n="1">
+                           <layer xml:id="d1mvw6mv" n="1">
+                              <note xml:id="el7z51t" dur.ppq="4" dur="1" oct="5" pname="c">
+                                 <accid xml:id="f1eozqg6" />
+                              </note>
+                           </layer>
+                        </staff>
+                     </measure>
+                     <scoreDef xml:id="qv3ddz1">
+                        <keySig xml:id="r10kzeyj" sig="3s" />
+                     </scoreDef>
+                     <measure xml:id="gusknjz" n="3">
+                        <staff xml:id="pla43ew" n="1">
+                           <layer xml:id="s1wef8t5" n="1">
+                              <note xml:id="t1ol93n0" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="u13a5m2n" accid.ges="s" glyph.auth="smufl" glyph.name="accidentalSharp" />
+                              </note>
+                              <note xml:id="v2dgoai" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="wksx7yg" accid="n" accid.ges="n" />
+                              </note>
+                              <note xml:id="xt9y8wc" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="yafa1gh" accid.ges="n" glyph.auth="smufl" glyph.name="accidentalNatural" />
+                              </note>
+                              <note xml:id="z2z8j6s" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="a1ger9ro" accid="s" accid.ges="s" />
+                              </note>
+                           </layer>
+                        </staff>
+                     </measure>
+                     <measure xml:id="b3ph1sk" n="4">
+                        <staff xml:id="kb15t0s" n="1">
+                           <layer xml:id="l1sa9255" n="1">
+                              <note xml:id="m1scszkh" dur.ppq="4" dur="1" oct="5" pname="c">
+                                 <accid xml:id="n133av2j" accid.ges="s" glyph.auth="smufl" glyph.name="accidentalSharp" />
+                              </note>
+                           </layer>
+                        </staff>
+                     </measure>
+                     <scoreDef xml:id="y12bz9ef">
+                        <keySig xml:id="z14ob6qn" sig="6f" />
+                     </scoreDef>
+                     <measure xml:id="ozytk0q" n="5">
+                        <staff xml:id="x6m08id" n="1">
+                           <layer xml:id="a1p6snpj" n="1">
+                              <note xml:id="b1dua2p5" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="c1pcfwbc" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="d1hq8jj6" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="ehopy76" accid="n" accid.ges="n" />
+                              </note>
+                              <note xml:id="fid6shh" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="gy4hc7r" accid.ges="n" glyph.auth="smufl" glyph.name="accidentalNatural" />
+                              </note>
+                              <note xml:id="h1fv3bdz" dur.ppq="1" dur="4" oct="5" pname="c" stem.dir="down">
+                                 <accid xml:id="i1fm9zaq" accid="f" accid.ges="f" />
+                              </note>
+                           </layer>
+                        </staff>
+                     </measure>
+                     <measure xml:id="jekpv" right="end" n="6">
+                        <staff xml:id="sx2s13f" n="1">
+                           <layer xml:id="t58y48e" n="1">
+                              <note xml:id="u17ldaa3" dur.ppq="4" dur="1" oct="5" pname="c">
+                                 <accid xml:id="vgocnac" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                           </layer>
+                        </staff>
+                     </measure>
+                  </section>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>
