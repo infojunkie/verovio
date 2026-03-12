@@ -1,6 +1,11 @@
 # Changelog
 
 ## [unreleased]
+
+## [6.1.1] – 2026-03-12
+* Fix cocoapods headers
+
+## [6.1.0] – 2026-03-12
 * Update MEI schema to 6.0-dev (6da4dd5071303ac53d73d7b5ea0399f9cfe7bdba)
 * Support for `stageDir`
 * Support for ASCL custom tuning (MusicXML import and MIDI output)
