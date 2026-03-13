@@ -243,6 +243,43 @@ jobs:
           name: java-build-${{ github.run_id }}
           path: ${{ github.workspace }}/${{ env.TEMP_DIR }}
 
+
+  ##################################
+  # Build and test the Go bindings #
+  ##################################
+  build_go:
+    # skip job if commit message contains "[skip-ci]"
+    if: "! contains(toJSON(github.event.commits.*.message), '[skip-ci]')"
+
+    name: Build Go bindings
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout main repo
+        uses: actions/checkout@v6.0.2
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: ${{ github.workspace }}/bindings/go/go.mod
+          cache-dependency-path: ${{ github.workspace }}/bindings/go/go.mod
+
+      - name: Build and install Verovio shared library
+        working-directory: ${{ github.workspace }}
+        run: |
+          cmake -S cmake -B build/go -DBUILD_AS_LIBRARY=ON -DCMAKE_INSTALL_PREFIX="$PWD/build/go/install"
+          cmake --build build/go -j8
+          cmake --install build/go
+
+      - name: Run Go tests
+        working-directory: ${{ github.workspace }}/bindings/go
+        env:
+          PKG_CONFIG_PATH: ${{ github.workspace }}/build/go
+          LD_LIBRARY_PATH: ${{ github.workspace }}/build/go/install/lib
+          VEROVIO_RESOURCE_PATH: ${{ github.workspace }}/build/go/install/share/verovio
+          GOCACHE: ${{ github.workspace }}/.gocache
+        run: go test ./...
+
   
   #####################################
   # Set up and cache emscripten build #
