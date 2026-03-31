@@ -1441,7 +1441,7 @@ Options::Options()
     this->Register(&m_octaveNoSpanningParentheses, "octaveNoSpanningParentheses", &m_generalLayout);
 
     m_ossiaStaffSize.SetInfo("Ossia staff size", "The ossia staff size in relation to the staff size");
-    m_ossiaStaffSize.Init(0.5, 0.75, 1.00);
+    m_ossiaStaffSize.Init(0.75, 0.5, 1.00);
     this->Register(&m_ossiaStaffSize, "ossiaStaffSize", &m_generalLayout);
 
     m_pedalLineThickness.SetInfo("Pedal line thickness", "The thickness of the line used for piano pedaling");
@@ -1853,6 +1853,10 @@ Options::Options()
     m_midiTempoAdjustment.SetInfo("MIDI tempo adjustment", "The MIDI tempo adjustment factor");
     m_midiTempoAdjustment.Init(1.0, 0.2, 4.0);
     this->Register(&m_midiTempoAdjustment, "midiTempoAdjustment", &m_midi);
+
+    m_midiTuningFile.SetInfo("MIDI tuning", "A custom tuning definition or filepath to apply to the MIDI output");
+    m_midiTuningFile.Init("");
+    this->Register(&m_midiTuningFile, "tuningFile", &m_midi);
 
     /********* Mensural *********/
 
