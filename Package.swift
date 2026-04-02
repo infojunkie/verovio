@@ -31,6 +31,7 @@ let package = Package(
                 .headerSearchPath("include/midi"),
                 .headerSearchPath("include/pugi"),
                 .headerSearchPath("include/utf8"),
+                .headerSearchPath("include/tuning-library"),
                 .headerSearchPath("include/vrv"),
                 .headerSearchPath("include/zip"),
                 .headerSearchPath("libmei/dist"),
