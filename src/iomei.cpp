@@ -310,13 +310,14 @@ std::string MEIOutput::Export()
         m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
-        m_doc->ConvertToCastOffMensuralDoc(false);
+        m_doc->ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_UNSET);
 
         // this starts the call of all the functors
         m_doc->SaveObject(this);
 
         // Redo the mensural segment cast of if necessary
-        m_doc->ConvertToCastOffMensuralDoc(true);
+        m_doc->ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_RESET);
+
         unsigned int output_flags = pugi::format_default;
         if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
             output_flags |= pugi::format_no_escapes;
