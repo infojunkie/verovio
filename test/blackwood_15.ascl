@@ -1,0 +1,26 @@
+! blackwood_15.ascl
+!
+15-EDO with Easley Blackwood's Ups and Downs Notation adapted for MusicXML.
+!
+15
+!
+80.
+160.
+240.
+320.
+400.
+480.
+560.
+640.
+720.
+800.
+880.
+960.
+1040.
+1120.
+1200.
+!
+! @ABL NOTE_NAMES B/C Cnatural-up/Dflat-up Csharp-down/Dnatural-down D/Eflat Dnatural-up/Eflat-up Dsharp-down/Enatural-down E/F Fnatural-up/Gflat-up Fsharp-down/Gnatural-down G/Aflat Gnatural-up/Aflat-up Gsharp-down/Anatural-down A/Bflat Anatural-up/Bflat-up Asharp-down/Bnatural-down
+! @ABL REFERENCE_PITCH 4 0 261.6256
+! @ABL SOURCE 15 equal temperament, Wikipedia.
+! @ABL LINK https://en.wikipedia.org/wiki/15_equal_temperament
