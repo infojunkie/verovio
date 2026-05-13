@@ -1256,6 +1256,11 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         resources.UseLiberationTextFont(m_options->m_fontTextLiberation.GetValue());
     }
 
+    // If changing midi options, reset the MIDI doc
+    if (json.has<jsonxx::Number>("midiTempoAdjustment") || json.has<jsonxx::Boolean>("midiNoCue")) {
+        this->ResetMidiDoc();
+    }
+
     return true;
 }
 
