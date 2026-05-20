@@ -1911,8 +1911,8 @@ Options::Options()
     m_gabcExtendedSymbols.Init(false);
     this->Register(&m_gabcExtendedSymbols, "gabcExtendedSymbols", &m_neume);
 
-    m_gabcStaffLines.SetInfo("GABC staff lines",
-        "Number of staff lines for GABC import (the GABC `staff-lines:` header value)");
+    m_gabcStaffLines.SetInfo(
+        "GABC staff lines", "Number of staff lines for GABC import (the GABC `staff-lines:` header value)");
     m_gabcStaffLines.Init(4, 4, 5);
     this->Register(&m_gabcStaffLines, "gabcStaffLines", &m_neume);
 
