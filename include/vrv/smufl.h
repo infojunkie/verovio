@@ -500,9 +500,6 @@ enum {
     SMUFL_E9BF_chantConnectingLineAsc4th = 0xE9BF,
     SMUFL_E9C0_chantConnectingLineAsc5th = 0xE9C0,
     SMUFL_E9C1_chantConnectingLineAsc6th = 0xE9C1,
-    SMUFL_E9D0_chantIctusAbove = 0xE9D0,
-    SMUFL_E9D1_chantIctusBelow = 0xE9D1,
-    SMUFL_E9D8_chantEpisema = 0xE9D8,
     SMUFL_E9E0_medRenFlatSoftB = 0xE9E0,
     SMUFL_E9E1_medRenFlatHardB = 0xE9E1,
     SMUFL_E9E2_medRenNatural = 0xE9E2,
@@ -675,7 +672,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 650
+#define SMUFL_COUNT 647
 
 } // namespace vrv
 
