@@ -1901,19 +1901,18 @@ Options::Options()
     // counterpart (S-GABC paper, Table mei1; sec. 6.3/6.5).
     m_gabcAquitanianContext.SetInfo("GABC Aquitanian context",
         "Render the GABC `V` left-stem (grule virga_left) using tilt=\"ne\" instead of the default "
-        "tilt=\"n\" used for square notation (see S-GABC paper, Table mei1).");
+        "tilt=\"n\" used for square notation.");
     m_gabcAquitanianContext.Init(false);
     this->Register(&m_gabcAquitanianContext, "gabcAquitanianContext", &m_neume);
 
     m_gabcExtendedSymbols.SetInfo("GABC extended (S-GABC) symbols",
-        "Enable the S-GABC proposed symbols: `r` for uncertain reading (S-GABC sec. 6.5) and `\"` "
-        "for clarifying lines (S-GABC sec. 6.3).");
+        "Enable the S-GABC proposed symbols: `r` for uncertain reading and `\"` "
+        "for clarifying lines");
     m_gabcExtendedSymbols.Init(false);
     this->Register(&m_gabcExtendedSymbols, "gabcExtendedSymbols", &m_neume);
 
     m_gabcStaffLines.SetInfo("GABC staff lines",
-        "Number of staff lines for GABC import (the GABC `staff-lines:` header value); accepted "
-        "values are 4 (default) and 5 — see Inconsistencies table, feature 2.");
+        "Number of staff lines for GABC import (the GABC `staff-lines:` header value)");
     m_gabcStaffLines.Init(4, 4, 5);
     this->Register(&m_gabcStaffLines, "gabcStaffLines", &m_neume);
 
