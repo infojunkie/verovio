@@ -100,6 +100,7 @@
 #import <VerovioFramework/editortoolkit_shared.h>
 #import <VerovioFramework/elementpart.h>
 #import <VerovioFramework/ending.h>
+#import <VerovioFramework/episema.h>
 #import <VerovioFramework/expan.h>
 #import <VerovioFramework/expansion.h>
 #import <VerovioFramework/expansionmap.h>
@@ -138,6 +139,7 @@
 #import <VerovioFramework/iobase.h>
 #import <VerovioFramework/iocmme.h>
 #import <VerovioFramework/iodarms.h>
+#import <VerovioFramework/iogabc.h>
 #import <VerovioFramework/iohumdrum.h>
 #import <VerovioFramework/iomei.h>
 #import <VerovioFramework/iomusxml.h>
@@ -231,6 +233,7 @@
 #import <VerovioFramework/staffdef.h>
 #import <VerovioFramework/staffgrp.h>
 #import <VerovioFramework/stem.h>
+#import <VerovioFramework/strophicus.h>
 #import <VerovioFramework/subst.h>
 #import <VerovioFramework/supplied.h>
 #import <VerovioFramework/surface.h>

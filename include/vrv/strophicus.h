@@ -1,14 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        liquescent.h
-// Author:      Gabby Halpin
-// Created:     2021
+// Name:        strophicus.h
+// Author:      David Rizo
+// Created:     2025
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_LIQUESCENT_H__
-#define __VRV_LIQUESCENT_H__
+#ifndef __VRV_STROPHICUS_H__
+#define __VRV_STROPHICUS_H__
 
-#include "atts_analytical.h"
 #include "atts_shared.h"
 #include "layerelement.h"
 #include "offsetinterface.h"
@@ -18,10 +17,10 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Liquescent
+// Strophicus
 //----------------------------------------------------------------------------
 
-class Liquescent : public LayerElement,
+class Strophicus : public LayerElement,
                    public OffsetInterface,
                    public PitchInterface,
                    public PositionInterface,
@@ -32,19 +31,11 @@ public:
      * Reset method resets all attribute classes
      */
     ///@{
-    Liquescent();
-    virtual ~Liquescent();
-    Object *Clone() const override { return new Liquescent(*this); }
+    Strophicus();
+    virtual ~Strophicus();
+    Object *Clone() const override { return new Strophicus(*this); }
     void Reset() override;
-    std::string GetClassName() const override { return "liquescent"; }
-    ///@}
-
-    /**
-     * @name Getter and setter for liquescent options
-     */
-    ///@{
-    bool HasNoTails() const { return (m_noTails); }
-    void SetNoTails(bool noTails) { m_noTails = noTails; }
+    std::string GetClassName() const override { return "strophicus"; }
     ///@}
 
     /**
@@ -63,8 +54,10 @@ public:
     bool HasToBeAligned() const override { return true; }
 
 private:
-    // Used for enabling the command-line option: --liquescent-no-tails
-    bool m_noTails = false;
+    //
+public:
+    //
+private:
 };
 
 } // namespace vrv
