@@ -1,26 +1,31 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        liquescent.cpp
-// Author:      Gabby Halpin
-// Created:     2021
+// Name:        strophicus.cpp
+// Author:      David Rizo
+// Created:     2025
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "liquescent.h"
+#include "strophicus.h"
+
+//----------------------------------------------------------------------------
+
+#include <assert.h>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "vrv.h"
 
 //----------------------------------------------------------------------------
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Liquescent
+// Strophicus
 //----------------------------------------------------------------------------
 
-Liquescent::Liquescent()
-    : LayerElement(LIQUESCENT), OffsetInterface(), PitchInterface(), PositionInterface(), AttColor()
+Strophicus::Strophicus()
+    : LayerElement(STROPHICUS), OffsetInterface(), PitchInterface(), PositionInterface(), AttColor()
 {
     this->RegisterInterface(OffsetInterface::GetAttClasses(), OffsetInterface::IsInterface());
     this->RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
@@ -30,9 +35,9 @@ Liquescent::Liquescent()
     this->Reset();
 }
 
-Liquescent::~Liquescent() {}
+Strophicus::~Strophicus() {}
 
-void Liquescent::Reset()
+void Strophicus::Reset()
 {
     LayerElement::Reset();
     OffsetInterface::Reset();

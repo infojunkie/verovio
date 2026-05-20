@@ -2,7 +2,9 @@
 
 ## [unreleased]
 * Golang binding
+* Support for G-ABC (Gregorian music notation) import
 * Support for `keyAccid@oct`
+* Option group for neumatic notation with various G-ABC options
 
 ## [6.1.1] – 2026-03-12
 * Fix cocoapods headers
