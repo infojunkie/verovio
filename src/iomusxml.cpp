@@ -3260,7 +3260,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                 element = chord;
                 if (cue) chord->SetCue(BOOLEAN_true);
                 if (grace) {
-                    if (grace.attribute("slash")) {
+                    if (grace.attribute("slash").as_bool()) {
                         chord->SetGrace(GRACE_unacc);
                         chord->SetStemMod(STEMMODIFIER_1slash);
                     }
@@ -3293,7 +3293,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
         // single grace note
         if (grace) {
-            if (grace.attribute("slash")) {
+            if (grace.attribute("slash").as_bool()) {
                 note->SetGrace(GRACE_unacc);
                 note->SetStemMod(STEMMODIFIER_1slash);
             }
