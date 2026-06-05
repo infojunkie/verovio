@@ -1,4 +1,5 @@
-# This script it expected to be run from ./bindings/python
+# This script can be run with an installed verovio package or from a CMake
+# build directory such as ./bindings/python.
 import argparse
 import json
 import os
@@ -35,7 +36,13 @@ if __name__ == '__main__':
     tk = verovio.toolkit(False)
     print(f'Verovio {tk.getVersion()}')
 
-    tk.setResourcePath('../../data')
+    resource_path = os.environ.get('VEROVIO_RESOURCE_PATH')
+    if resource_path:
+        tk.setResourcePath(resource_path)
+    else:
+        source_tree_data = os.path.abspath('../../data')
+        if os.path.isdir(source_tree_data):
+            tk.setResourcePath(source_tree_data)
 
     # look if we have a shortlist file and read it
     if len(args.shortlist) > 0:
