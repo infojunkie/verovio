@@ -7955,8 +7955,8 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
         }
     }
     else {
-	/* Don't need to transmit primary mensuration?
-	std::cerr << "GOT HERE AAA " << primarymensuration << std::endl;
+        /* Don't need to transmit primary mensuration?
+        std::cerr << "GOT HERE AAA " << primarymensuration << std::endl;
         if ((primarymensuration == "C|") || (primarymensuration == "c|")) {
             setTimeSig(m_staffdef.back(), "*M2/1", metersig, staffstart);
             setMeterSymbol(m_staffdef.back(), primarymensuration, staffindex, staffstart, metertok);
@@ -7969,7 +7969,7 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
             setTimeSig(m_staffdef.back(), "*M3/1", metersig, staffstart, metertok);
             setMeterSymbol(m_staffdef.back(), primarymensuration, staffindex, staffstart);
         }
-	*/
+        */
     }
 
     addInstrumentDefinition(m_staffdef.back(), staffstart);
@@ -14345,9 +14345,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 addBarLineElement(token, elements, pointers);
             }
         }
-	if (token->isClef()) {
-    		ss.at(m_currentstaff - 1).last_clef = *token;
-	}
+        if (token->isClef()) {
+            ss.at(m_currentstaff - 1).last_clef = *token;
+        }
         if (!token->isData()) {
             continue;
         }
@@ -26142,7 +26142,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     std::string subnote = *token;
     if (subtoken >= 0) {
-	subnote = token->getSubtoken(subtoken);
+        subnote = token->getSubtoken(subtoken);
     }
 
     if (subtoken <= 0) {
@@ -26170,8 +26170,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     bool chordQ = token->isChord();
     bool unpitchedQ = (subnote.find('R') != std::string::npos);
     bool badpitchedQ = false;
-    if ((unpitchedQ ^ (ss[staffindex].last_clef.compare(0, 6, "*clefX") == 0)) ||
-       (!unpitchedQ ^ (ss[staffindex].last_clef.compare(0, 6, "*clefX") != 0))) {
+    if ((unpitchedQ ^ (ss[staffindex].last_clef.compare(0, 6, "*clefX") == 0))
+        || (!unpitchedQ ^ (ss[staffindex].last_clef.compare(0, 6, "*clefX") != 0))) {
         badpitchedQ = true;
         unpitchedQ = true;
     }
@@ -26402,7 +26402,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
     if (badpitchedQ) {
         if (ss[staffindex].last_clef.compare(0, 6, "*clefX")) {
             note->SetColor("#c41414");
-	} else {
+        }
+        else {
             note->SetColor("#c41414");
         }
     }
