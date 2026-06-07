@@ -49,6 +49,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "episema.h"
 #include "expan.h"
 #include "expansion.h"
 #include "expansionmap.h"
@@ -135,6 +136,7 @@
 #include "staffdef.h"
 #include "staffgrp.h"
 #include "stem.h"
+#include "strophicus.h"
 #include "subst.h"
 #include "supplied.h"
 #include "surface.h"
@@ -162,11 +164,11 @@
 #include "zone.h"
 
 #define VEROVIO_SERIALIZATION "verovio.serialization"
-#define MEI_ALL_SCHEMA "https://music-encoding.org/schema/5.1/mei-all.rng"
-#define MEI_BASIC_SCHEMA "https://music-encoding.org/schema/5.1/mei-basic.rng"
-#define MEI_PAGE_BASED_SCHEMA "https://www.verovio.org/schema/5.1/mei-verovio.rng"
-#define MEI_CURRENT_VERSION meiVersion_MEIVERSION_5_1
-#define MEI_CURRENT_BASIC_VERSION meiVersion_MEIVERSION_5_1plusbasic
+#define MEI_ALL_SCHEMA "https://music-encoding.org/schema/dev/mei-all.rng"
+#define MEI_BASIC_SCHEMA "https://music-encoding.org/schema/dev/mei-basic.rng"
+#define MEI_PAGE_BASED_SCHEMA "https://www.verovio.org/schema/dev/mei-verovio.rng"
+#define MEI_CURRENT_VERSION meiVersion_MEIVERSION_6_0_dev
+#define MEI_CURRENT_BASIC_VERSION meiVersion_MEIVERSION_6_0_devplusbasic
 
 namespace vrv {
 
@@ -310,13 +312,14 @@ std::string MEIOutput::Export()
         m_mei.append_attribute("meiversion") = (converter.MeiVersionMeiversionToStr(meiVersion)).c_str();
 
         // If the document is mensural, we have to undo the mensural (segments) cast off
-        m_doc->ConvertToCastOffMensuralDoc(false);
+        m_doc->ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_UNSET);
 
         // this starts the call of all the functors
         m_doc->SaveObject(this);
 
         // Redo the mensural segment cast of if necessary
-        m_doc->ConvertToCastOffMensuralDoc(true);
+        m_doc->ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_RESET);
+
         unsigned int output_flags = pugi::format_default;
         if (m_doc->GetOptions()->m_outputSmuflXmlEntities.GetValue()) {
             output_flags |= pugi::format_no_escapes;
@@ -557,7 +560,14 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         this->WriteCpMark(m_currentNode, vrv_cast<CpMark *>(object));
     }
     else if (object->Is(DIR)) {
-        m_currentNode = m_currentNode.append_child("dir");
+        Dir *dir = vrv_cast<Dir *>(object);
+        assert(dir);
+        if (dir->IsStageDir()) {
+            m_currentNode = m_currentNode.append_child("stageDir");
+        }
+        else {
+            m_currentNode = m_currentNode.append_child("dir");
+        }
         this->WriteDir(m_currentNode, vrv_cast<Dir *>(object));
     }
     else if (object->Is(DYNAM)) {
@@ -769,6 +779,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
             m_currentNode = m_currentNode.append_child("multiRpt");
             this->WriteMultiRpt(m_currentNode, vrv_cast<MultiRpt *>(object));
         }
+        else if (object->Is(EPISEMA)) {
+            m_currentNode = m_currentNode.append_child("episema");
+            this->WriteEpisema(m_currentNode, vrv_cast<Episema *>(object));
+        }
         else if (object->Is(NC)) {
             m_currentNode = m_currentNode.append_child("nc");
             this->WriteNc(m_currentNode, vrv_cast<Nc *>(object));
@@ -796,6 +810,10 @@ bool MEIOutput::WriteObjectInternal(Object *object, bool useCustomScoreDef)
         else if (object->Is(QUILISMA)) {
             m_currentNode = m_currentNode.append_child("quilisma");
             this->WriteQuilisma(m_currentNode, vrv_cast<Quilisma *>(object));
+        }
+        else if (object->Is(STROPHICUS)) {
+            m_currentNode = m_currentNode.append_child("strophicus");
+            this->WriteStrophicus(m_currentNode, vrv_cast<Strophicus *>(object));
         }
         else if (object->Is(REST)) {
             m_currentNode = m_currentNode.append_child("rest");
@@ -2695,9 +2713,8 @@ void MEIOutput::WriteKeySig(pugi::xml_node currentNode, KeySig *keySig)
     }
 
     this->WriteLayerElement(currentNode, keySig);
-    keySig->WriteAccidental(currentNode);
     keySig->WriteColor(currentNode);
-    keySig->WriteKeyMode(currentNode);
+    keySig->WriteKeySigAnl(currentNode);
     keySig->WriteKeySigLog(currentNode);
     keySig->WriteKeySigVis(currentNode);
     keySig->WritePitch(currentNode);
@@ -2845,6 +2862,18 @@ void MEIOutput::WriteMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt)
     multiRpt->WriteNumbered(currentNode);
 }
 
+void MEIOutput::WriteEpisema(pugi::xml_node currentNode, Episema *episema)
+{
+    assert(episema);
+
+    this->WriteLayerElement(currentNode, episema);
+    this->WriteOffsetInterface(currentNode, episema);
+    this->WritePitchInterface(currentNode, episema);
+    this->WritePositionInterface(currentNode, episema);
+    episema->WriteColor(currentNode);
+    episema->WriteEpisemaVis(currentNode);
+}
+
 void MEIOutput::WriteNc(pugi::xml_node currentNode, Nc *nc)
 {
     assert(nc);
@@ -2931,6 +2960,16 @@ void MEIOutput::WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma)
     this->WriteOffsetInterface(currentNode, quilisma);
     this->WritePitchInterface(currentNode, quilisma);
     quilisma->WriteColor(currentNode);
+}
+
+void MEIOutput::WriteStrophicus(pugi::xml_node currentNode, Strophicus *strophicus)
+{
+    assert(strophicus);
+
+    this->WriteLayerElement(currentNode, strophicus);
+    this->WriteOffsetInterface(currentNode, strophicus);
+    this->WritePitchInterface(currentNode, strophicus);
+    strophicus->WriteColor(currentNode);
 }
 
 void MEIOutput::WriteRest(pugi::xml_node currentNode, Rest *rest)
@@ -3553,6 +3592,93 @@ std::string MEIOutput::DocTypeToStr(DocType type)
 }
 
 //----------------------------------------------------------------------------
+// MEIOutputExtended
+//----------------------------------------------------------------------------
+
+MEIOutputExtended::MEIOutputExtended(Doc *doc) : MEIOutput(doc) {}
+
+jsonxx::Object MEIOutputExtended::ExportScoreDef()
+{
+    try {
+        pugi::xml_document meiDoc;
+        std::ostringstream streamStringOutput;
+
+        m_currentNode = meiDoc.root();
+        m_nodeStack.push_back(m_currentNode);
+        m_doc->GetFirstScoreDef()->SaveObject(this);
+
+        return ToJson(meiDoc);
+    }
+    catch (char *str) {
+        LogError("%s", str);
+        return jsonxx::Object();
+    }
+}
+
+jsonxx::Object MEIOutputExtended::ToJson(const pugi::xml_document &doc)
+{
+    std::function<jsonxx::Object(pugi::xml_node)> nodeToJson = [&](pugi::xml_node node) -> jsonxx::Object {
+        jsonxx::Object jsonNode;
+
+        // Id is mandatory - including for text nodes
+        jsonNode << "id" << (node.attribute("xml:id") ? node.attribute("xml:id").value() : Object().GetID());
+
+        if (node.type() == pugi::node_pcdata) {
+            jsonNode << "text" << node.value();
+            jsonNode << "isLeaf" << true;
+            jsonNode << "element" << "text";
+        }
+        else {
+            jsonNode << "element" << std::string(node.name());
+
+            // Attributes
+            jsonxx::Object attributes;
+            for (auto attr : node.attributes()) {
+                // Skip xml:id and id as they are captured separately
+                if (std::string(attr.name()) != "xml:id") {
+                    attributes << attr.name() << attr.value();
+                }
+            }
+            if (!attributes.empty()) {
+                jsonNode << "attributes" << attributes;
+            }
+        }
+
+        // Children elements
+        jsonxx::Array childrenArray;
+        for (pugi::xml_node child : node.children()) {
+            if (child.type() == pugi::node_element || child.type() == pugi::node_pcdata) {
+                childrenArray << nodeToJson(child);
+            }
+        }
+
+        if (!childrenArray.empty()) {
+            jsonNode << "children" << childrenArray;
+        }
+        else {
+            jsonNode << "isLeaf" << true;
+        }
+
+        return jsonNode;
+    };
+
+    // Find first element node in the document
+    pugi::xml_node rootNode;
+    for (pugi::xml_node node = doc.first_child(); node; node = node.next_sibling()) {
+        if (node.type() == pugi::node_element) {
+            rootNode = node;
+            break;
+        }
+    }
+
+    if (!rootNode) {
+        return jsonxx::Object(); // empty
+    }
+
+    return nodeToJson(rootNode);
+}
+
+//----------------------------------------------------------------------------
 // MEIInput
 //----------------------------------------------------------------------------
 
@@ -3912,13 +4038,19 @@ bool MEIInput::IsAllowed(std::string element, Object *filterParent)
     }
     // filter for nc
     else if (filterParent->Is(NC)) {
-        if (element == "liquescent") {
+        if (element == "episema") {
+            return true;
+        }
+        else if (element == "liquescent") {
             return true;
         }
         else if (element == "oriscus") {
             return true;
         }
         else if (element == "quilisma") {
+            return true;
+        }
+        else if (element == "strophicus") {
             return true;
         }
         else {
@@ -4083,10 +4215,10 @@ bool MEIInput::ReadDoc(pugi::xml_node root)
         AttConverter converter;
         m_meiversion = converter.StrToMeiVersionMeiversion(version);
     }
-    // Default to MEI 5.1
+    // Default to MEI 6.0-dev
     if (m_meiversion == meiVersion_MEIVERSION_NONE) {
-        LogWarning("MEI version found or not known, falling back to MEI 5.1");
-        m_meiversion = meiVersion_MEIVERSION_5_1;
+        LogWarning("MEI version found or not known, falling back to MEI 6.0-dev");
+        m_meiversion = meiVersion_MEIVERSION_6_0_dev;
     }
 
     // only try to handle meiHead if we have a full MEI document
@@ -5769,6 +5901,9 @@ bool MEIInput::ReadMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (currentName == "staff") {
             success = this->ReadStaff(parent, current);
         }
+        else if (currentName == "stageDir") {
+            success = this->ReadDir(parent, current, true);
+        }
         else if (currentName == "tempo") {
             success = this->ReadTempo(parent, current);
         }
@@ -5989,9 +6124,9 @@ bool MEIInput::ReadCpMark(Object *parent, pugi::xml_node cpMark)
     return this->ReadTextChildren(vrvCpMark, cpMark, vrvCpMark);
 }
 
-bool MEIInput::ReadDir(Object *parent, pugi::xml_node dir)
+bool MEIInput::ReadDir(Object *parent, pugi::xml_node dir, bool isStageDir)
 {
-    Dir *vrvDir = new Dir();
+    Dir *vrvDir = new Dir(isStageDir);
     this->ReadControlElement(dir, vrvDir);
 
     this->ReadTextDirInterface(dir, vrvDir);
@@ -6554,6 +6689,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "dot") {
             success = this->ReadDot(parent, xmlElement);
         }
+        else if (elementName == "episema") {
+            success = this->ReadEpisema(parent, xmlElement);
+        }
         else if (elementName == "fTrem") {
             success = this->ReadFTrem(parent, xmlElement);
         }
@@ -6602,15 +6740,6 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "note") {
             success = this->ReadNote(parent, xmlElement);
         }
-        else if (elementName == "oriscus") {
-            success = this->ReadOriscus(parent, xmlElement);
-        }
-        else if (elementName == "quilisma") {
-            success = this->ReadQuilisma(parent, xmlElement);
-        }
-        else if (elementName == "rest") {
-            success = this->ReadRest(parent, xmlElement);
-        }
         else if (elementName == "mRest") {
             success = this->ReadMRest(parent, xmlElement);
         }
@@ -6629,6 +6758,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "multiRpt") {
             success = this->ReadMultiRpt(parent, xmlElement);
         }
+        else if (elementName == "oriscus") {
+            success = this->ReadOriscus(parent, xmlElement);
+        }
         else if (elementName == "pb") {
             success = this->ReadGenericLayerElement(parent, xmlElement);
         }
@@ -6638,6 +6770,12 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         else if (elementName == "proport") {
             success = this->ReadProport(parent, xmlElement);
         }
+        else if (elementName == "quilisma") {
+            success = this->ReadQuilisma(parent, xmlElement);
+        }
+        else if (elementName == "rest") {
+            success = this->ReadRest(parent, xmlElement);
+        }
         else if (elementName == "sb") {
             success = this->ReadGenericLayerElement(parent, xmlElement);
         }
@@ -6646,6 +6784,9 @@ bool MEIInput::ReadLayerChildren(Object *parent, pugi::xml_node parentNode, Obje
         }
         else if (elementName == "stem") {
             success = this->ReadStem(parent, xmlElement);
+        }
+        else if (elementName == "strophicus") {
+            success = this->ReadStrophicus(parent, xmlElement);
         }
         else if (elementName == "syl") {
             success = this->ReadSyl(parent, xmlElement);
@@ -7025,9 +7166,8 @@ bool MEIInput::ReadKeySig(Object *parent, pugi::xml_node keySig)
         UpgradeKeySigTo_5_0(keySig);
     }
 
-    vrvKeySig->ReadAccidental(keySig);
     vrvKeySig->ReadColor(keySig);
-    vrvKeySig->ReadKeyMode(keySig);
+    vrvKeySig->ReadKeySigAnl(keySig);
     vrvKeySig->ReadKeySigLog(keySig);
     vrvKeySig->ReadKeySigVis(keySig);
     vrvKeySig->ReadPitch(keySig);
@@ -7213,6 +7353,21 @@ bool MEIInput::ReadMultiRpt(Object *parent, pugi::xml_node multiRpt)
     parent->AddChild(vrvMultiRpt);
     this->ReadUnsupportedAttr(multiRpt, vrvMultiRpt);
     return true;
+}
+
+bool MEIInput::ReadEpisema(Object *parent, pugi::xml_node episema)
+{
+    Episema *vrvEpisema = new Episema();
+    this->ReadLayerElement(episema, vrvEpisema);
+
+    this->ReadOffsetInterface(episema, vrvEpisema);
+    this->ReadPitchInterface(episema, vrvEpisema);
+    this->ReadPositionInterface(episema, vrvEpisema);
+    vrvEpisema->ReadColor(episema);
+    vrvEpisema->ReadEpisemaVis(episema);
+
+    parent->AddChild(vrvEpisema);
+    return this->ReadLayerChildren(vrvEpisema, episema, vrvEpisema);
 }
 
 bool MEIInput::ReadNc(Object *parent, pugi::xml_node nc)
@@ -7406,6 +7561,21 @@ bool MEIInput::ReadStem(Object *parent, pugi::xml_node stem)
 
     parent->AddChild(vrvStem);
     this->ReadUnsupportedAttr(stem, vrvStem);
+    return true;
+}
+
+bool MEIInput::ReadStrophicus(Object *parent, pugi::xml_node strophicus)
+{
+    Strophicus *vrvStrophicus = new Strophicus();
+    this->ReadLayerElement(strophicus, vrvStrophicus);
+
+    this->ReadOffsetInterface(strophicus, vrvStrophicus);
+    this->ReadPositionInterface(strophicus, vrvStrophicus);
+    vrvStrophicus->ReadColor(strophicus);
+
+    parent->AddChild(vrvStrophicus);
+    this->ReadUnsupportedAttr(strophicus, vrvStrophicus);
+
     return true;
 }
 
@@ -8664,9 +8834,9 @@ void MEIInput::NormalizeAttributes(pugi::xml_node &xmlElement)
         std::string value = elem.value();
 
         size_t pos = value.find_first_not_of(' ');
-        if (pos != std::string::npos) value = value.substr(pos);
+        if (pos != std::string::npos) value.erase(0, pos);
         pos = value.find_last_not_of(' ');
-        if (pos != std::string::npos) value = value.substr(0, pos + 1);
+        if (pos != std::string::npos) value.resize(pos + 1);
 
         elem.set_value(value.c_str());
     }
@@ -9088,6 +9258,64 @@ bool MEIInput::ReadFacsimile(Doc *doc, pugi::xml_node facsimile)
     }
     doc->SetFacsimile(vrvFacsimile);
     return true;
+}
+
+//----------------------------------------------------------------------------
+// MEIInputExtended
+//----------------------------------------------------------------------------
+
+MEIInputExtended::MEIInputExtended(Doc *doc) : MEIInput(doc) {}
+
+pugi::xml_document MEIInputExtended::FromJson(const jsonxx::Object &json)
+{
+    pugi::xml_document doc;
+
+    std::function<void(const jsonxx::Object &, pugi::xml_node &)> jsonToNode
+        = [&](const jsonxx::Object &jsonNode, pugi::xml_node &parent) {
+              std::string elementName = jsonNode.get<std::string>("element");
+
+              // Special case for text nodes
+              if (elementName == "text") {
+                  pugi::xml_node textNode = parent.append_child(pugi::node_pcdata);
+                  if (jsonNode.has<jsonxx::String>("text")) {
+                      textNode.set_value(jsonNode.get<std::string>("text").c_str());
+                  }
+                  return;
+              }
+
+              // Regular element node
+              pugi::xml_node xmlNode = parent.append_child(elementName.c_str());
+
+              // Convert xml:id from top-level "id"
+              if (jsonNode.has<jsonxx::String>("id")) {
+                  xmlNode.append_attribute("xml:id") = jsonNode.get<std::string>("id").c_str();
+              }
+
+              // Convert attributes
+              if (jsonNode.has<jsonxx::Object>("attributes")) {
+                  jsonxx::Object attrs = jsonNode.get<jsonxx::Object>("attributes");
+
+                  for (auto it = attrs.kv_map().begin(); it != attrs.kv_map().end(); ++it) {
+                      xmlNode.append_attribute(it->first.c_str()) = it->second;
+                  }
+              }
+
+              // Convert children
+              if (jsonNode.has<jsonxx::Array>("children")) {
+                  jsonxx::Array children = jsonNode.get<jsonxx::Array>("children");
+
+                  for (int i = 0; i < (int)children.size(); ++i) {
+                      jsonToNode(children.get<jsonxx::Object>(i), xmlNode);
+                  }
+              }
+          };
+
+    if (json.empty()) {
+        return doc;
+    }
+
+    jsonToNode(json, doc);
+    return doc;
 }
 
 } // namespace vrv

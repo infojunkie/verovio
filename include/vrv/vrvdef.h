@@ -38,8 +38,8 @@ namespace vrv {
 // Version
 //----------------------------------------------------------------------------
 
-#define VERSION_MAJOR 5
-#define VERSION_MINOR 8
+#define VERSION_MAJOR 6
+#define VERSION_MINOR 3
 #define VERSION_REVISION 0
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
@@ -223,6 +223,7 @@ enum ClassId : uint16_t {
     DIVLINE,
     DOT,
     DOTS,
+    EPISEMA,
     FLAG,
     FTREM,
     GENERIC_ELEMENT,
@@ -248,6 +249,7 @@ enum ClassId : uint16_t {
     PLICA,
     PROPORT,
     QUILISMA,
+    STROPHICUS,
     REST,
     SPACE,
     STEM,
@@ -282,6 +284,7 @@ enum ClassId : uint16_t {
     SVG_DEVICE_CONTEXT,
     CUSTOM_DEVICE_CONTEXT,
     // Pseudo ids for custom factory functions
+    FACTORY_STAGEDIR,
     FACTORY_OSTAFF,
     //
     UNSPECIFIED
@@ -715,6 +718,12 @@ enum MeasureType { MEASURED = 0, UNMEASURED, NEUMELINE };
 //----------------------------------------------------------------------------
 
 enum FocusStatusType { FOCUS_UNSET = 0, FOCUS_SET, FOCUS_USED };
+
+//----------------------------------------------------------------------------
+// Mensural cast-off type
+//----------------------------------------------------------------------------
+
+enum MensuralCastOffType { MENSURAL_CAST_OFF_INIT = 0, MENSURAL_CAST_OFF_UNSET, MENSURAL_CAST_OFF_RESET };
 
 //----------------------------------------------------------------------------
 // The score time unit (quarter note)

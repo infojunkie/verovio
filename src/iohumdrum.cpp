@@ -9531,10 +9531,10 @@ void HumdrumInput::setKeySig(
             case 'b': vrvkeysig->SetPname(PITCHNAME_b); break;
         }
         if (accidental == "-") {
-            vrvkeysig->SetAccid(ACCIDENTAL_WRITTEN_f);
+            vrvkeysig->SetAccid(ACCIDENTAL_GESTURAL_basic_f);
         }
         else if (accidental == "#") {
-            vrvkeysig->SetAccid(ACCIDENTAL_WRITTEN_s);
+            vrvkeysig->SetAccid(ACCIDENTAL_GESTURAL_basic_s);
         }
     }
 }
@@ -32624,7 +32624,7 @@ void HumdrumInput::finalizeDocument(Doc *doc)
         doc->PrepareData();
         doc->SetMensuralMusicOnly(BOOLEAN_true);
         doc->m_notationType = NOTATIONTYPE_mensural;
-        doc->ConvertToCastOffMensuralDoc(true);
+        doc->ConvertToCastOffMensuralDoc(MENSURAL_CAST_OFF_INIT);
     }
 }
 

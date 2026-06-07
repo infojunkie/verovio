@@ -21,6 +21,7 @@
 #include "attalternates.h"
 #include "atttypes.h"
 #include "smufl.h"
+#include "toolkitdef.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
@@ -77,6 +78,8 @@ enum option_HEADER { HEADER_none = 0, HEADER_auto, HEADER_encoded };
 
 enum option_LIGATURE_OBL { LIGATURE_OBL_auto = 0, LIGATURE_OBL_straight, LIGATURE_OBL_curved };
 
+enum option_MENSURAL_RESP { MENSURAL_RESP_none = 0, MENSURAL_RESP_auto, MENSURAL_RESP_selection };
+
 enum option_MULTIRESTSTYLE {
     MULTIRESTSTYLE_auto = 0,
     MULTIRESTSTYLE_default,
@@ -92,7 +95,7 @@ enum option_SMUFLTEXTFONT { SMUFLTEXTFONT_embedded = 0, SMUFLTEXTFONT_linked, SM
 // Option
 //----------------------------------------------------------------------------
 
-enum class OptionsCategory { None, Base, General, Json, Layout, Mensural, Margins, Midi, Selectors, Full };
+enum class OptionsCategory { None, Base, General, Json, Layout, Mensural, Margins, Midi, Neume, Selectors, Full };
 
 /**
  * This class is a base class of each styling parameter
@@ -151,6 +154,7 @@ public:
     static const std::map<int, std::string> s_footer;
     static const std::map<int, std::string> s_header;
     static const std::map<int, std::string> s_ligatureOblique;
+    static const std::map<int, std::string> s_mensuralResponsiveness;
     static const std::map<int, std::string> s_multiRestStyle;
     static const std::map<int, std::string> s_pedalStyle;
     static const std::map<int, std::string> s_systemDivider;
@@ -582,6 +586,11 @@ public:
     Options(const Options &options);
     Options &operator=(const Options &options);
 
+    bool SetInputFrom(std::string const &inputFrom);
+    bool SetOutputTo(std::string const &outputTo);
+    FileFormat GetInputFrom() const { return m_inputFromFormat; }
+    FileFormat GetOutputTo() const { return m_outputToFormat; }
+
     const MapOfStrOptions *GetItems() const { return &m_items; }
 
     const std::vector<OptionGrp *> *GetGrps() const { return &m_grps; }
@@ -617,6 +626,9 @@ public:
     OptionBool m_version;
     OptionInt m_xmlIdSeed;
 
+    FileFormat m_inputFromFormat;
+    FileFormat m_outputToFormat;
+
     /**
      * General
      */
@@ -631,7 +643,6 @@ public:
     OptionBool m_condenseNotLastSystem;
     OptionBool m_condenseTempoPages;
     OptionBool m_evenNoteSpacing;
-    OptionString m_expand;
     OptionIntMap m_footer;
     OptionIntMap m_header;
     OptionBool m_humType;
@@ -773,6 +784,9 @@ public:
 
     OptionArray m_appXPathQuery;
     OptionArray m_choiceXPathQuery;
+    OptionString m_expand;
+    OptionBool m_expandAlways;
+    OptionBool m_expandNever;
     OptionBool m_loadSelectedMdivOnly;
     OptionBool m_mdivAll;
     OptionString m_mdivXPathQuery;
@@ -845,6 +859,7 @@ public:
 
     OptionBool m_midiNoCue;
     OptionDbl m_midiTempoAdjustment;
+    OptionString m_midiTuningFile;
 
     /**
      * Mensural
@@ -855,8 +870,21 @@ public:
     OptionBool m_ligatureAsBracket;
     OptionIntMap m_ligatureOblique;
     OptionBool m_mensuralScoreUp;
-    OptionBool m_mensuralResponsiveView;
+    OptionIntMap m_mensuralResponsiveView;
     OptionBool m_mensuralToCmn;
+
+    /**
+     * Neume
+     */
+    OptionGrp m_neume;
+
+    // 18-may-2026 Neume options. Cover GABC import features that have no direct MEI Neume module
+    // counterpart (grammar rules: clef, virga_left, S-GABC sec. 6.3/6.5) plus rendering tweaks
+    // for chant notation.
+    OptionBool m_gabcAquitanianContext;
+    OptionBool m_gabcExtendedSymbols;
+    OptionInt m_gabcStaffLines;
+    OptionBool m_liquescentWithoutTails;
 
     /**
      * Additional options for passing method JSON options to the command-line

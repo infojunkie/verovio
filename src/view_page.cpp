@@ -819,7 +819,7 @@ void View::DrawBarLine(DeviceContext *dc, int yTop, int yBottom, BarLine *barLin
     assert(barLine);
 
     Staff *staff = barLine->GetAncestorStaff(ANCESTOR_ONLY, false);
-    const int staffSize = (staff) ? staff->m_drawingStaffSize : 100;
+    const int staffSize = (staff) ? staff->GetDrawingStaffNotationSize() : 100;
     const int unit = m_doc->GetDrawingUnit(staffSize);
 
     const int x = barLine->GetDrawingX();
@@ -1550,7 +1550,7 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     LayerElement *previous = NULL;
     LayerElement *pelement = layer->GetAtPos(x_pos);
-    if ((previous = layer->GetPrevious(pelement))) pelement = previous;
+    if ((previous = layer->GetPreviousInLayer(pelement))) pelement = previous;
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {

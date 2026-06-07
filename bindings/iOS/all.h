@@ -5,6 +5,9 @@
 #import <VerovioFramework/MidiEventList.h>
 #import <VerovioFramework/MidiFile.h>
 #import <VerovioFramework/MidiMessage.h>
+#import <VerovioFramework/Tunings.h>
+#import <VerovioFramework/TuningsConcepts.h>
+#import <VerovioFramework/TuningsImpl.h>
 #import <VerovioFramework/abbr.h>
 #import <VerovioFramework/accid.h>
 #import <VerovioFramework/add.h>
@@ -73,6 +76,7 @@
 #import <VerovioFramework/course.h>
 #import <VerovioFramework/cpmark.h>
 #import <VerovioFramework/crc.h>
+#import <VerovioFramework/customtuning.h>
 #import <VerovioFramework/custos.h>
 #import <VerovioFramework/damage.h>
 #import <VerovioFramework/del.h>
@@ -93,8 +97,10 @@
 #import <VerovioFramework/editortoolkit_cmn.h>
 #import <VerovioFramework/editortoolkit_mensural.h>
 #import <VerovioFramework/editortoolkit_neume.h>
+#import <VerovioFramework/editortoolkit_shared.h>
 #import <VerovioFramework/elementpart.h>
 #import <VerovioFramework/ending.h>
+#import <VerovioFramework/episema.h>
 #import <VerovioFramework/expan.h>
 #import <VerovioFramework/expansion.h>
 #import <VerovioFramework/expansionmap.h>
@@ -133,6 +139,7 @@
 #import <VerovioFramework/iobase.h>
 #import <VerovioFramework/iocmme.h>
 #import <VerovioFramework/iodarms.h>
+#import <VerovioFramework/iogabc.h>
 #import <VerovioFramework/iohumdrum.h>
 #import <VerovioFramework/iomei.h>
 #import <VerovioFramework/iomusxml.h>
@@ -226,6 +233,7 @@
 #import <VerovioFramework/staffdef.h>
 #import <VerovioFramework/staffgrp.h>
 #import <VerovioFramework/stem.h>
+#import <VerovioFramework/strophicus.h>
 #import <VerovioFramework/subst.h>
 #import <VerovioFramework/supplied.h>
 #import <VerovioFramework/surface.h>

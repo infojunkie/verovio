@@ -534,29 +534,30 @@ void PreparePlistFunctor::InsertInterfaceObjectIDPair(Object *objectWithPlist, c
 FunctorCode PreparePlistFunctor::VisitObject(Object *object)
 {
     if (this->IsCollectingData()) {
-        // Skip expansion elements because these are handled in Doc::ExpandExpansions
-        if (object->HasInterface(INTERFACE_PLIST) && !object->Is(EXPANSION)) {
+        if (object->HasInterface(INTERFACE_PLIST)) {
             PlistInterface *interface = object->GetPlistInterface();
             assert(interface);
             return interface->InterfacePreparePlist(*this, object);
         }
     }
     else {
-        if (!object->IsLayerElement()) return FUNCTOR_CONTINUE;
+        if (!object->IsLayerElement() && !object->Is({ ENDING, EXPANSION, SECTION })) return FUNCTOR_CONTINUE;
 
         const std::string &id = object->GetID();
-        auto iter = std::find_if(m_plistObjectIDPairs.begin(), m_plistObjectIDPairs.end(),
-            [&id](const std::pair<Object *, std::string> &pair) { return (pair.second == id); });
-        if (iter != m_plistObjectIDPairs.end()) {
-            // Set reference for matched pair and erase it from the list
-            PlistInterface *interface = iter->first->GetPlistInterface();
-            assert(interface);
-            interface->SetRef(object);
-            // Add back link to the object referred in the plist - for now only for Annot
-            if (iter->first->Is(ANNOTSCORE)) {
-                object->AddPlistReference(iter->first);
+        for (auto it = m_plistObjectIDPairs.begin(); it != m_plistObjectIDPairs.end();) {
+            if (it->second == id) {
+                PlistInterface *interface = it->first->GetPlistInterface();
+                assert(interface);
+                interface->SetRef(object);
+                // Add back link to the object referred in the plist - for now only for Annot
+                if (it->first->Is(ANNOTSCORE)) {
+                    object->AddPlistReference(it->first);
+                }
+                it = m_plistObjectIDPairs.erase(it); // returns next valid iterator
             }
-            m_plistObjectIDPairs.erase(iter);
+            else {
+                ++it;
+            }
         }
     }
 
@@ -1088,24 +1089,33 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
     if (!syl->GetStart()) {
         syl->SetStart(vrv_cast<LayerElement *>(syl->GetFirstAncestor(CHORD, MAX_CHORD_DEPTH)));
     }
+    const bool isEmptySyl = syl->IsEmpty();
 
     // At this stage currentSyl is actually the previous one that is ending here
     if (m_currentSyl) {
         // The previous syl was an initial or median -> The note we just parsed is the end
         if ((m_currentSyl->GetWordpos() == sylLog_WORDPOS_i) || (m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
-            m_currentSyl->SetEnd(m_lastNoteOrChord);
-            m_currentSyl->m_nextWordSyl = syl;
+            if (!isEmptySyl) {
+                m_currentSyl->SetEnd(m_lastNoteOrChord);
+                m_currentSyl->m_nextWordSyl = syl;
+            }
         }
-        // The previous syl was a underscore -> the previous but one was the end
+        // The previous syl was an underscore -> the explicit empty endpoint or the previous but one was the end.
         else if (m_currentSyl->GetCon() == sylLog_CON_u) {
-            if (m_currentSyl->GetStart() == m_penultimateNoteOrChord) {
+            LayerElement *end = isEmptySyl ? syl->GetStart() : m_penultimateNoteOrChord;
+            if (end && (m_currentSyl->GetStart() == end)) {
                 LogWarning("Syllable with underline extender under one single note '%s'",
                     m_currentSyl->GetStart()->GetID().c_str());
             }
-            else {
-                m_currentSyl->SetEnd(m_penultimateNoteOrChord);
+            else if (end) {
+                m_currentSyl->SetEnd(end);
             }
         }
+    }
+
+    if (isEmptySyl) {
+        m_currentSyl = NULL;
+        return FUNCTOR_CONTINUE;
     }
 
     // Now decide what to do with the starting syl and check if it has a forward connector

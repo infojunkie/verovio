@@ -115,6 +115,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(DOTS)) {
         this->DrawDots(dc, element, layer, staff, measure);
     }
+    else if (element->Is(EPISEMA)) {
+        this->DrawEpisema(dc, element, layer, staff, measure);
+    }
     else if (element->Is(FTREM)) {
         this->DrawFTrem(dc, element, layer, staff, measure);
     }
@@ -183,6 +186,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(QUILISMA)) {
         this->DrawQuilisma(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(STROPHICUS)) {
+        this->DrawStrophicus(dc, element, layer, staff, measure);
     }
     else if (element->Is(REST)) {
         this->DrawDurationElement(dc, element, layer, staff, measure);
@@ -1482,7 +1488,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         return;
     }
-    if (note->IsTabGrpNote()) {
+
+    if (staff->IsTablature()) {
         this->DrawTabNote(dc, element, layer, staff, measure);
         return;
     }
@@ -1590,7 +1597,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     const int staffSize = staff->GetDrawingStaffNotationSize();
     data_DURATION drawingDur = rest->GetActualDur();
     // in tablature the @dur is in the parent TabGrp - try to get if from there
-    if ((drawingDur == DURATION_NONE) && staff->IsTablature()) {
+    if ((drawingDur == DURATION_NONE) && (staff->IsTablature() || staff->IsTabStaffLike())) {
         TabGrp *tabGrp = vrv_cast<TabGrp *>(rest->GetFirstAncestor(TABGRP));
         if (tabGrp != NULL) drawingDur = tabGrp->GetActualDur();
     }

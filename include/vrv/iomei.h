@@ -58,6 +58,7 @@ class DivLine;
 class DurationInterface;
 class Dynam;
 class Ending;
+class Episema;
 class Expan;
 class Expansion;
 class F;
@@ -149,6 +150,7 @@ class Slur;
 class Space;
 class Staff;
 class Stem;
+class Strophicus;
 class Subst;
 class Supplied;
 class Surface;
@@ -407,6 +409,7 @@ private:
     void WriteCustos(pugi::xml_node currentNode, Custos *custos);
     void WriteDivLine(pugi::xml_node currentNode, DivLine *divLine);
     void WriteDot(pugi::xml_node currentNode, Dot *dot);
+    void WriteEpisema(pugi::xml_node currentNode, Episema *episema);
     void WriteFTrem(pugi::xml_node currentNode, FTrem *fTrem);
     void WriteGenericLayerElement(pugi::xml_node currentNode, GenericLayerElement *element);
     void WriteGraceGrp(pugi::xml_node currentNode, GraceGrp *graceGrp);
@@ -430,6 +433,7 @@ private:
     void WritePlica(pugi::xml_node currentNode, Plica *plica);
     void WriteProport(pugi::xml_node currentNode, Proport *proport);
     void WriteQuilisma(pugi::xml_node currentNode, Quilisma *quilisma);
+    void WriteStrophicus(pugi::xml_node currentNode, Strophicus *strophicus);
     void WriteRest(pugi::xml_node currentNode, Rest *rest);
     void WriteSpace(pugi::xml_node currentNode, Space *space);
     void WriteStem(pugi::xml_node currentNode, Stem *stem);
@@ -577,6 +581,12 @@ private:
 
 public:
     //
+protected:
+    /** Current xml element */
+    pugi::xml_node m_currentNode;
+    /** Xml node stack */
+    std::list<pugi::xml_node> m_nodeStack;
+
 private:
     /** The number of spaces for the indentation */
     int m_indent;
@@ -589,11 +599,6 @@ private:
 
     /** The document node */
     pugi::xml_node m_mei;
-
-    /** Current xml element */
-    pugi::xml_node m_currentNode;
-    /** Xml node stack */
-    std::list<pugi::xml_node> m_nodeStack;
     /** Boundary objects which are merged into one xml element */
     std::stack<Object *> m_boundaries;
     /** The object stack */
@@ -617,6 +622,26 @@ private:
     bool m_ignoreHeader;
     bool m_removeIds;
     SetOfConstObjects m_referredObjects;
+};
+
+//----------------------------------------------------------------------------
+// MEIOutputExtended
+//----------------------------------------------------------------------------
+
+/**
+ * Extended MEIOutput for partial exports.
+ */
+class MEIOutputExtended : public MEIOutput {
+public:
+    /** @name Constructors and destructor */
+    ///@{
+    MEIOutputExtended(Doc *doc);
+    ///@}
+
+    jsonxx::Object ExportScoreDef();
+
+private:
+    jsonxx::Object ToJson(const pugi::xml_document &doc);
 };
 
 //----------------------------------------------------------------------------
@@ -738,6 +763,7 @@ private:
     bool ReadCustos(Object *parent, pugi::xml_node custos);
     bool ReadDivLine(Object *parent, pugi::xml_node divLine);
     bool ReadDot(Object *parent, pugi::xml_node dot);
+    bool ReadEpisema(Object *parent, pugi::xml_node episema);
     bool ReadFTrem(Object *parent, pugi::xml_node fTrem);
     bool ReadGenericLayerElement(Object *parent, pugi::xml_node element);
     bool ReadGraceGrp(Object *parent, pugi::xml_node graceGrp);
@@ -764,6 +790,7 @@ private:
     bool ReadRest(Object *parent, pugi::xml_node rest);
     bool ReadSpace(Object *parent, pugi::xml_node space);
     bool ReadStem(Object *parent, pugi::xml_node stem);
+    bool ReadStrophicus(Object *parent, pugi::xml_node strophicus);
     bool ReadSyl(Object *parent, pugi::xml_node syl);
     bool ReadSyllable(Object *parent, pugi::xml_node syllable);
     bool ReadTabDurSym(Object *parent, pugi::xml_node tabDurSym);
@@ -783,7 +810,7 @@ private:
     bool ReadBreath(Object *parent, pugi::xml_node breath);
     bool ReadCaesura(Object *parent, pugi::xml_node caesura);
     bool ReadCpMark(Object *parent, pugi::xml_node cpMark);
-    bool ReadDir(Object *parent, pugi::xml_node dir);
+    bool ReadDir(Object *parent, pugi::xml_node dir, bool isStageDir = false);
     bool ReadDynam(Object *parent, pugi::xml_node dynam);
     bool ReadFermata(Object *parent, pugi::xml_node fermata);
     bool ReadFing(Object *parent, pugi::xml_node fing);
@@ -1017,6 +1044,26 @@ private:
      * A static array for storing the implemented editorial elements
      */
     static const std::vector<std::string> s_editorialElementNames;
+};
+
+//----------------------------------------------------------------------------
+// MEIInputExtended
+//----------------------------------------------------------------------------
+
+/**
+ * Extended MEIInput for partial import.
+ */
+class MEIInputExtended : public MEIInput {
+public:
+    /** @name Constructors and destructor */
+    ///@{
+    MEIInputExtended(Doc *doc);
+    ///@}
+
+    void ImportScoreDef(const jsonxx::Object &scoreDef);
+
+private:
+    pugi::xml_document FromJson(const jsonxx::Object &json);
 };
 
 } // namespace vrv
