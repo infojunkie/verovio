@@ -120,7 +120,8 @@ FunctorCode LayerElementsInTimeSpanFunctor::VisitLayerElement(const LayerElement
         return FUNCTOR_CONTINUE;
     }
 
-    if (!layerElement->GetDurationInterface() || layerElement->IsAnyOf({ MSPACE, SPACE })) return FUNCTOR_CONTINUE;
+    if (!layerElement->GetDurationInterface() || layerElement->IsAnyOf(std::array{ MSPACE, SPACE }))
+        return FUNCTOR_CONTINUE;
 
     Fraction duration = !layerElement->GetFirstAncestor(CHORD)
         ? layerElement->GetAlignmentDuration(m_meterParams)
@@ -267,7 +268,7 @@ FunctorCode GetRelativeLayerElementFunctor::VisitLayerElement(const LayerElement
         }
     }
 
-    if (layerElement->IsAnyOf({ NOTE, CHORD, FTREM })) {
+    if (layerElement->IsAnyOf(std::array{ NOTE, CHORD, FTREM })) {
         m_relativeElement = layerElement;
         return FUNCTOR_STOP;
     }

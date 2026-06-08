@@ -743,7 +743,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(
 {
     FloatingPositioner *positioner = this->GetCorrespFloatingPositioner(object);
     if (positioner == NULL) {
-        if (object->IsAnyOf({ LV, PHRASE, SLUR, TIE })) {
+        if (object->IsAnyOf(std::array{ LV, PHRASE, SLUR, TIE })) {
             positioner = new FloatingCurvePositioner(object, this, spanningType);
             m_floatingPositioners.push_back(positioner);
         }

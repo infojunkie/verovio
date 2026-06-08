@@ -1022,7 +1022,9 @@ void EditorToolkitShared::ContextForObject(const Object *object, jsonxx::Object 
     }
     // Remove children that are added as element parts (never exist in EditorTreeObject)
     children.erase(std::remove_if(children.begin(), children.end(),
-                       [](const Object *item) { return item->IsAnyOf({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET }); }),
+                       [](const Object *item) {
+                           return item->IsAnyOf(std::array{ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET });
+                       }),
         children.end());
 
     if (children.size() > 0) {
@@ -1053,7 +1055,7 @@ void EditorToolkitShared::ContextForObjects(const ArrayOfConstObjects &objects, 
             if (mNum->IsGenerated()) continue;
         }
         if (object->IsAttribute()) continue;
-        if (object->IsAnyOf({ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET })) continue;
+        if (object->IsAnyOf(std::array{ DOTS, FLAG, STEM, TUPLET_NUM, TUPLET_BRACKET })) continue;
 
         jsonxx::Object element;
         this->ContextForObject(object, element);
