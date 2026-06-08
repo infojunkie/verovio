@@ -42,7 +42,7 @@ BoundingBox::BoundingBox()
     this->ResetBoundingBox();
 }
 
-bool BoundingBox::Is(const std::vector<ClassId> &classIds) const
+bool BoundingBox::IsAnyOf(const std::vector<ClassId> &classIds) const
 {
     return (std::find(classIds.begin(), classIds.end(), this->GetClassId()) != classIds.end());
 }
@@ -634,7 +634,7 @@ int BoundingBox::Intersects(const FloatingCurvePositioner *curve, Accessor type,
 {
     assert(curve);
     assert(curve->GetObject());
-    assert(curve->GetObject()->Is({ LV, PHRASE, SLUR, TIE }));
+    assert(curve->GetObject()->IsAnyOf({ LV, PHRASE, SLUR, TIE }));
 
     // for readability
     Point points[4];

@@ -120,7 +120,7 @@ FunctorCode LayerElementsInTimeSpanFunctor::VisitLayerElement(const LayerElement
         return FUNCTOR_CONTINUE;
     }
 
-    if (!layerElement->GetDurationInterface() || layerElement->Is({ MSPACE, SPACE })) return FUNCTOR_CONTINUE;
+    if (!layerElement->GetDurationInterface() || layerElement->IsAnyOf({ MSPACE, SPACE })) return FUNCTOR_CONTINUE;
 
     Fraction duration = !layerElement->GetFirstAncestor(CHORD)
         ? layerElement->GetAlignmentDuration(m_meterParams)
@@ -176,7 +176,7 @@ FunctorCode FindSpannedLayerElementsFunctor::VisitLayerElement(const LayerElemen
 {
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
-    if (!layerElement->Is(m_classIds)) {
+    if (!layerElement->IsAnyOf(m_classIds)) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -267,7 +267,7 @@ FunctorCode GetRelativeLayerElementFunctor::VisitLayerElement(const LayerElement
         }
     }
 
-    if (layerElement->Is({ NOTE, CHORD, FTREM })) {
+    if (layerElement->IsAnyOf({ NOTE, CHORD, FTREM })) {
         m_relativeElement = layerElement;
         return FUNCTOR_STOP;
     }
