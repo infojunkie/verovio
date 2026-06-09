@@ -31652,7 +31652,7 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             else if (hre.search(value, "marked note|matched note")) {
                 m_signifiers.mens_mark.push_back(signifier);
                 m_signifiers.mens_mcolor.push_back("red");
-                if (hre.search(value, R"re(text\s*=\s*"?([^"]+)"?))re")) {
+                if (hre.search(value, "text\\s*=\\s*\"?([^\"]+)\"?")) {
                     m_signifiers.mens_markdir.push_back(hre.getMatch(1));
                 }
                 else {
