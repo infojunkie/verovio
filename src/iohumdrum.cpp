@@ -7956,7 +7956,6 @@ void HumdrumInput::fillStaffInfo(hum::HTp staffstart, int staffnumber, int staff
     }
     else {
         /* Don't need to transmit primary mensuration?
-        std::cerr << "GOT HERE AAA " << primarymensuration << std::endl;
         if ((primarymensuration == "C|") || (primarymensuration == "c|")) {
             setTimeSig(m_staffdef.back(), "*M2/1", metersig, staffstart);
             setMeterSymbol(m_staffdef.back(), primarymensuration, staffindex, staffstart, metertok);
@@ -14351,7 +14350,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         if (!token->isData()) {
             continue;
         }
-
         if (token->isMensLike()) {
             convertMensuralToken(elements, pointers, token, staffindex);
             continue;
@@ -26588,8 +26586,10 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         accidCount = testaccid;
     }
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
-    bool showInAccid = token->hasVisibleAccidental(stindex);
-    bool showInAccidGes = !showInAccid;
+    //bool showInAccid = token->hasVisibleAccidental(stindex);
+    // always show mensural accidentals
+    bool showInAccid = true;
+    bool showInAccidGes = false;
     bool brackQ = hasLayoutParameter(token, "ACC", "brack");
     bool parenQ = hasLayoutParameter(token, "ACC", "paren");
     std::string loaccid = token->getLayoutParameter("N", "acc", subtoken);
@@ -26642,6 +26642,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
 
             if (editorialQ) {
                 accid->SetGlyphAuth("smufl");
+
                 switch (accidCount) {
                     case +3:
                         accid->SetAccid(ACCIDENTAL_WRITTEN_xs);
