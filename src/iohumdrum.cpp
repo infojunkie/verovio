@@ -26586,7 +26586,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffadj, int sta
         accidCount = testaccid;
     }
     // int accidCount = hum::Convert::kernToAccidentalCount(tstring);
-    //bool showInAccid = token->hasVisibleAccidental(stindex);
+    // bool showInAccid = token->hasVisibleAccidental(stindex);
     // always show mensural accidentals
     bool showInAccid = true;
     bool showInAccidGes = false;
