@@ -139,7 +139,7 @@ jobs:
     needs: validate
     if: github.ref == 'refs/heads/develop-pypi'
     runs-on: ubuntu-latest
-    environment: testpypi
+    environment: test-pypi
     permissions:
       contents: read
       id-token: write
