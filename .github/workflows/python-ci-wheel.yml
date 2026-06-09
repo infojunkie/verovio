@@ -224,6 +224,7 @@ jobs:
           repository-url: https://test.pypi.org/legacy/
           packages-dir: dist/
           skip-existing: true
+          attestations: false
 
   publish_pypi:
     name: Publish to PyPI
