@@ -1,0 +1,509 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/dev/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/dev/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="6.0-dev">
+   <meiHead xml:id="macno71">
+      <fileDesc xml:id="favr1mf">
+         <titleStmt xml:id="tbroi0p">
+            <title>Der Herr ist mein Hirte</title>
+            <respStmt>
+               <persName role="arranger">Arthur Henry Troyte</persName>
+               <persName role="composer">Arthur Henry Troyte</persName>
+            </respStmt>
+         </titleStmt>
+         <pubStmt xml:id="pxuu2an">
+            <date isodate="2026-05-19" type="encoding-date">2026-05-19</date>
+         </pubStmt>
+      </fileDesc>
+      <encodingDesc xml:id="ee2xjng">
+         <appInfo xml:id="arwzsv6">
+            <application xml:id="abg3kmo" isodate="2026-06-03T23:54:22" version="6.3.0-dev-e47a152">
+               <name xml:id="nh1occe">Verovio</name>
+               <p xml:id="polbwlw">Transcoded from MusicXML</p>
+            </application>
+         </appInfo>
+      </encodingDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv xml:id="bdrbsab">
+            <score xml:id="c1ykgtlj">
+               <scoreDef xml:id="dnpephs">
+                  <staffGrp xml:id="f19a63gc">
+                     <staffGrp xml:id="g11zk88y">
+                        <grpSym xml:id="h9o3tyb" symbol="bracket" />
+                        <staffDef xml:id="P1" n="1" lines="5" ppq="1">
+                           <instrDef xml:id="i1xwlwws" midi.channel="0" midi.instrnum="52" midi.volume="78%" />
+                           <clef xml:id="r7q5nrj" shape="G" line="2" />
+                           <keySig xml:id="s16at8xw" sig="3f" />
+                           <meterSig xml:id="ttk70tj" count="12" unit="4" visible="false" />
+                        </staffDef>
+                        <staffDef xml:id="P2" n="2" lines="5" ppq="1">
+                           <instrDef xml:id="q11ibrw6" midi.channel="1" midi.instrnum="52" midi.volume="78%" />
+                           <clef xml:id="z1p2cqbv" shape="F" line="4" />
+                           <keySig xml:id="a199d9sq" sig="3f" />
+                           <meterSig xml:id="bpc14rz" count="12" unit="4" visible="false" />
+                        </staffDef>
+                     </staffGrp>
+                  </staffGrp>
+               </scoreDef>
+               <section xml:id="ehnb5s1">
+                  <expansion plist="#s12kta8p" xml:id="t1r0df8o" />
+                  <section xml:id="s12kta8p">
+                     <measure xml:id="u1r34ku3" n="1">
+                        <staff xml:id="d197tcvh" n="1">
+                           <layer xml:id="eqyfzbe" n="1">
+                              <note xml:id="f12k1s7n" dur.ppq="8" dur="breve" oct="4" pname="g">
+                                 <verse xml:id="hb0xj5h" n="1">
+                                    <syl xml:id="i1iochfs" con="s" wordpos="s">Der Herr ist mein</syl>
+                                 </verse>
+                                 <verse xml:id="k3m7gqu" n="2">
+                                    <syl xml:id="lef5f7m" con="s" wordpos="s">Er erquicket meine</syl>
+                                 </verse>
+                                 <verse xml:id="nlx4bq6" n="3">
+                                    <syl xml:id="o1hgk2vp" con="s" wordpos="s">Und ob ich schon wanderte im</syl>
+                                 </verse>
+                                 <verse xml:id="q1ys17u2" n="4">
+                                    <syl xml:id="rp259id" con="s" wordpos="s">Du bereitest vor mir</syl>
+                                 </verse>
+                                 <verse xml:id="tgroc7f" n="5">
+                                    <syl xml:id="uf0871v" con="d" wordpos="i">Gutes und Barm</syl>
+                                 </verse>
+                                 <verse xml:id="wjlw8af" n="6">
+                                    <syl xml:id="x6gbqxl" con="s" wordpos="s">Ehre sei dem Vater</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="z148gjcr" dur.ppq="1" dur="4" oct="4" pname="g" stem.dir="up">
+                                 <verse xml:id="b1u0yja3" n="1">
+                                    <syl xml:id="c1rh2u01" con="d" wordpos="i">Hir</syl>
+                                 </verse>
+                                 <verse xml:id="e1ukoeiz" n="2">
+                                    <syl xml:id="f1pji1sg" con="d" wordpos="i">See</syl>
+                                 </verse>
+                                 <verse xml:id="hl05vvl" n="3">
+                                    <syl xml:id="i1e0sczw" con="d" wordpos="i">fins</syl>
+                                 </verse>
+                                 <verse xml:id="k4se0su" n="4">
+                                    <syl xml:id="lgdfqq3" con="d" wordpos="i">ei</syl>
+                                 </verse>
+                                 <verse xml:id="nxzvjy3" n="5">
+                                    <syl xml:id="o8icpfl" con="d" wordpos="m">her</syl>
+                                 </verse>
+                                 <verse xml:id="quqpr4o" n="6">
+                                    <syl xml:id="r1xgzaie" con="s" wordpos="s">und</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="u17c1j4r" dur.ppq="1" dur="4" oct="4" pname="f" stem.dir="up">
+                                 <verse xml:id="w7yfbyl" n="3">
+                                    <syl xml:id="xgf9epc" con="s" wordpos="t">tern</syl>
+                                 </verse>
+                                 <verse xml:id="z1bh2dsp" n="4">
+                                    <syl xml:id="a805fmi" con="s" wordpos="t">nen</syl>
+                                 </verse>
+                                 <verse xml:id="c16bitg" n="5">
+                                    <syl xml:id="dohlo5p" con="d" wordpos="m">zig</syl>
+                                 </verse>
+                                 <verse xml:id="fm4i9s7" n="6">
+                                    <syl xml:id="gaa0lti" con="s" wordpos="s">dem</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="ihfnp5j" dur.ppq="2" dur="2" oct="4" pname="e" stem.dir="up">
+                                 <accid xml:id="j1e0lwlv" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                                 <verse xml:id="k4cu7ok" n="1">
+                                    <syl xml:id="l2ya4lf" con="s" wordpos="t">te,</syl>
+                                 </verse>
+                                 <verse xml:id="n1w1oqux" n="2">
+                                    <syl xml:id="oxv3kx0" con="s" wordpos="t">le.</syl>
+                                 </verse>
+                                 <verse xml:id="q7daavq" n="3">
+                                    <syl xml:id="r57yjjg" con="s" wordpos="s">Tal,</syl>
+                                 </verse>
+                                 <verse xml:id="t1bgmvfz" n="4">
+                                    <syl xml:id="ugy9c52" con="s" wordpos="s">Tisch</syl>
+                                 </verse>
+                                 <verse xml:id="w1vw8x9w" n="5">
+                                    <syl xml:id="x158sxom" con="s" wordpos="t">keit</syl>
+                                 </verse>
+                                 <verse xml:id="z15n3451" n="6">
+                                    <syl xml:id="a1evwh4l" con="s" wordpos="s">Sohn</syl>
+                                 </verse>
+                              </note>
+                           </layer>
+                           <layer xml:id="e1q22fya" n="2">
+                              <note xml:id="fp96bsp" dur.ppq="8" dur="breve" oct="4" pname="e">
+                                 <accid xml:id="g8yb7ey" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="h180h9n" dur.ppq="1" dur="4" oct="4" pname="e" stem.dir="down">
+                                 <accid xml:id="i1j24gyo" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="k7rsdzy" dur.ppq="1" dur="4" oct="4" pname="d" stem.dir="down" />
+                              <note xml:id="m136nsrc" dur.ppq="2" dur="2" oct="4" pname="e" stem.dir="down">
+                                 <accid xml:id="n106z8ck" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                           </layer>
+                        </staff>
+                        <staff xml:id="l59zdl7" n="2">
+                           <layer xml:id="m1l8vws3" n="1">
+                              <note xml:id="n1fgw4zi" dur.ppq="8" dur="breve" oct="3" pname="b">
+                                 <accid xml:id="ofmtmbi" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="p14ccl9i" dur.ppq="1" dur="4" oct="3" pname="b" stem.dir="up">
+                                 <accid xml:id="q1tcgqbl" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="s1rdpci6" dur.ppq="1" dur="4" oct="3" pname="a" stem.dir="up">
+                                 <accid xml:id="t1gyhmxu" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="unrabmw" dur.ppq="2" dur="2" oct="3" pname="g" stem.dir="up" />
+                           </layer>
+                           <layer xml:id="ybwxapd" n="2">
+                              <note xml:id="znyw3wy" dur.ppq="8" dur="breve" oct="3" pname="e">
+                                 <accid xml:id="a1df071b" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="bi11e21" dur.ppq="1" dur="4" oct="3" pname="e" stem.dir="down">
+                                 <accid xml:id="cr4fh18" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="ed3vlz0" dur.ppq="1" dur="4" oct="2" pname="b" stem.dir="down">
+                                 <accid xml:id="fpsvers" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="g1hav2s8" dur.ppq="2" dur="2" oct="3" pname="c" stem.dir="down" />
+                           </layer>
+                        </staff>
+                        <slur xml:id="thjzjif" startid="#z148gjcr" endid="#u17c1j4r" lform="dotted" />
+                        <breath xml:id="d1oa14ea" staff="1" tstamp="12.5" />
+                        <slur xml:id="jw4b9sg" startid="#h180h9n" endid="#k7rsdzy" lform="dotted" />
+                        <slur xml:id="r4mj0n8" startid="#p14ccl9i" endid="#s1rdpci6" lform="dotted" />
+                        <breath xml:id="xfy291t" staff="2" tstamp="12.5" />
+                        <slur xml:id="do6ac5d" startid="#bi11e21" endid="#ed3vlz0" lform="dotted" />
+                     </measure>
+                     <measure xml:id="o17i0ke2" n="2">
+                        <staff xml:id="xwgmu" n="1">
+                           <layer xml:id="y1seobaf" n="1">
+                              <note xml:id="zay9hxp" dur.ppq="8" dur="breve" oct="4" pname="a">
+                                 <accid xml:id="a1ucpufq" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                                 <verse xml:id="btbcfir" n="1">
+                                    <syl xml:id="cst64wu" con="s" wordpos="s">mir wird nichts</syl>
+                                 </verse>
+                                 <verse xml:id="ezst2sd" n="2">
+                                    <syl xml:id="f1y4rhag" con="s" wordpos="s">Er führet mich auf rechter</syl>
+                                 </verse>
+                                 <verse xml:id="h1cgz79z" n="3">
+                                    <syl xml:id="i1eattow" con="s" wordpos="s">fürchte ich kein</syl>
+                                 </verse>
+                                 <verse xml:id="knd6p7c" n="4">
+                                    <syl xml:id="l10q5g0w" con="s" wordpos="s">im Angesicht meiner</syl>
+                                 </verse>
+                                 <verse xml:id="n1mnc2y0" n="5">
+                                    <syl xml:id="o1s9zhqb" con="s" wordpos="s">werden mir folgen mein</syl>
+                                 </verse>
+                                 <verse xml:id="qjsirf" n="6">
+                                    <syl xml:id="rt9gomt" con="s" wordpos="s">und dem</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="taenqo3" dur.ppq="1" dur="4" oct="4" pname="a" stem.dir="up">
+                                 <accid xml:id="u1jqvp77" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                                 <verse xml:id="vd26wa2" n="1">
+                                    <syl xml:id="w1xefb81" con="d" wordpos="i">man</syl>
+                                 </verse>
+                                 <verse xml:id="y18a60kv" n="2">
+                                    <syl xml:id="z1h5cdpv" con="d" wordpos="i">Stra</syl>
+                                 </verse>
+                                 <verse xml:id="b1fydyk5" n="3">
+                                    <syl xml:id="cthncvc" con="d" wordpos="i">Un</syl>
+                                 </verse>
+                                 <verse xml:id="e1b37pvv" n="4">
+                                    <syl xml:id="f1e5k7e9" con="d" wordpos="i">Fein</syl>
+                                 </verse>
+                                 <verse xml:id="h7nz0yu" n="5">
+                                    <syl xml:id="iet40qm" con="d" wordpos="i">Le</syl>
+                                 </verse>
+                                 <verse xml:id="ki3al4e" n="6">
+                                    <syl xml:id="l1l25g1s" con="d" wordpos="i">Heili</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="osonx3w" dur.ppq="1" dur="4" oct="4" pname="g" stem.dir="up">
+                                 <verse xml:id="q1hoapzy" n="5">
+                                    <syl xml:id="r1lmzprc" con="s" wordpos="t">ben</syl>
+                                 </verse>
+                                 <verse xml:id="tgqzcqj" n="6">
+                                    <syl xml:id="u1h4qoxo" con="s" wordpos="t">gen</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="wt9mfby" dur.ppq="2" dur="2" oct="4" pname="f" stem.dir="up">
+                                 <verse xml:id="yzsbfux" n="1">
+                                    <syl xml:id="zz0sizo" con="s" wordpos="t">geln.</syl>
+                                 </verse>
+                                 <verse xml:id="b1yy63rq" n="2">
+                                    <syl xml:id="c10cb732" con="s" wordpos="t">ße</syl>
+                                 </verse>
+                                 <verse xml:id="e1pln3q7" n="3">
+                                    <syl xml:id="ftddfx6" con="s" wordpos="t">glück,</syl>
+                                 </verse>
+                                 <verse xml:id="h141ancf" n="4">
+                                    <syl xml:id="i1ce0j2f" con="s" wordpos="t">de.</syl>
+                                 </verse>
+                                 <verse xml:id="k1n1ja1k" n="5">
+                                    <syl xml:id="l1kwlxgw" con="s" wordpos="s">lang,</syl>
+                                 </verse>
+                                 <verse xml:id="nk5aaim" n="6">
+                                    <syl xml:id="ol760hv" con="s" wordpos="s">Geist,</syl>
+                                 </verse>
+                              </note>
+                           </layer>
+                           <layer xml:id="svgjqj3" n="2">
+                              <note xml:id="t1vymak8" dur.ppq="8" dur="breve" oct="4" pname="c" />
+                              <note xml:id="v1eivuo7" dur.ppq="1" dur="4" oct="3" pname="b" stem.dir="down">
+                                 <accid xml:id="wd0r95p" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="y1qlnlpa" dur.ppq="1" dur="4" oct="4" pname="e" stem.dir="down">
+                                 <accid xml:id="z142mwon" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="a94lu7s" dur.ppq="2" dur="2" oct="4" pname="d" stem.dir="down" />
+                           </layer>
+                        </staff>
+                        <staff xml:id="rrldr6b" n="2">
+                           <layer xml:id="sz7gwyx" n="1">
+                              <note xml:id="txswtn7" dur.ppq="8" dur="breve" oct="3" pname="e">
+                                 <accid xml:id="uoqf8xj" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="vfsp3q0" dur.ppq="1" dur="4" oct="3" pname="f" stem.dir="up" />
+                              <note xml:id="y1ifj57d" dur.ppq="1" dur="4" oct="3" pname="b" stem.dir="up">
+                                 <accid xml:id="z116bz45" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="a1aub15f" dur.ppq="2" dur="2" oct="3" pname="b" stem.dir="up">
+                                 <accid xml:id="b10l5bsd" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                           </layer>
+                           <layer xml:id="e18k5z4u" n="2">
+                              <note xml:id="flblixz" dur.ppq="8" dur="breve" oct="3" pname="c" />
+                              <note xml:id="h1o2told" dur.ppq="1" dur="4" oct="3" pname="d" stem.dir="down" />
+                              <note xml:id="k1md7f5a" dur.ppq="1" dur="4" oct="3" pname="e" stem.dir="down">
+                                 <accid xml:id="l1ehx4da" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="mc4h4do" dur.ppq="2" dur="2" oct="2" pname="b" stem.dir="down">
+                                 <accid xml:id="n1fkbdd" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                           </layer>
+                        </staff>
+                        <slur xml:id="n22bolw" startid="#taenqo3" endid="#osonx3w" lform="dotted" />
+                        <breath xml:id="rave7s6" staff="1" tstamp="12.5" />
+                        <slur xml:id="xuwbml0" startid="#v1eivuo7" endid="#y1qlnlpa" lform="dotted" />
+                        <slur xml:id="x1jf1hfc" startid="#vfsp3q0" endid="#y1ifj57d" lform="dotted" />
+                        <breath xml:id="d154390t" staff="2" tstamp="12.5" />
+                        <slur xml:id="jz03v8a" startid="#h1o2told" endid="#k1md7f5a" lform="dotted" />
+                     </measure>
+                     <measure xml:id="c25o4b3" n="3">
+                        <staff xml:id="l1ppwfvx" n="1">
+                           <layer xml:id="m1nknwnz" n="1">
+                              <note xml:id="n10nrbtq" dur.ppq="8" dur="breve" oct="4" pname="b">
+                                 <accid xml:id="opsi68q" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                                 <verse xml:id="p9ezjaf" n="1">
+                                    <syl xml:id="q6dabcr" con="s" wordpos="s">Er weidet mich auf einer grünen</syl>
+                                 </verse>
+                                 <verse xml:id="s1cu51x8" n="2">
+                                    <syl xml:id="t1ke5qhc" con="s" wordpos="s">um seines Names</syl>
+                                 </verse>
+                                 <verse xml:id="vd6emzg" n="3">
+                                    <syl xml:id="w1dv9jcf" con="s" wordpos="s">denn du bist</syl>
+                                 </verse>
+                                 <verse xml:id="y1kngvwn" n="4">
+                                    <syl xml:id="z14fpd00" con="s" wordpos="s">Du salbest mein</syl>
+                                 </verse>
+                                 <verse xml:id="b1cqzy4p" n="5">
+                                    <syl xml:id="c1lfq1am" con="s" wordpos="s">und ich werde</syl>
+                                 </verse>
+                                 <verse xml:id="e1xqzwvy" n="6">
+                                    <syl xml:id="fmydvmt" con="s" wordpos="s">wie im Anfang, so auch jetzt und</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="h17mj7fy" dur.ppq="1" dur="4" oct="4" pname="b" stem.dir="up">
+                                 <accid xml:id="i184jq91" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                                 <verse xml:id="j148hn5j" n="1">
+                                    <syl xml:id="kd0zqv5" con="d" wordpos="i">Au</syl>
+                                 </verse>
+                                 <verse xml:id="m1n42agg" n="2">
+                                    <syl xml:id="n12clj70" con="d" wordpos="i">wil</syl>
+                                 </verse>
+                                 <verse xml:id="pteyxlu" n="3">
+                                    <syl xml:id="qemjdpe" con="s" wordpos="s">bei</syl>
+                                 </verse>
+                                 <verse xml:id="s111jdvs" n="4">
+                                    <syl xml:id="t1kddh9z" con="s" wordpos="s">Haupt</syl>
+                                 </verse>
+                                 <verse xml:id="v1sso4xn" n="5">
+                                    <syl xml:id="wkgkel2" con="d" wordpos="i">blei</syl>
+                                 </verse>
+                                 <verse xml:id="y12yk4tl" n="6">
+                                    <syl xml:id="zt2rkch" con="d" wordpos="i">al</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="cr1338a" dur.ppq="1" dur="4" oct="4" pname="a" stem.dir="up">
+                                 <accid xml:id="d112debr" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                                 <verse xml:id="e6xbzwg" n="4">
+                                    <syl xml:id="fdpy5u" con="s" wordpos="s">mit</syl>
+                                 </verse>
+                                 <verse xml:id="h1ash4wk" n="6">
+                                    <syl xml:id="iepdbho" con="s" wordpos="t">le</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="kie5a8y" dur.ppq="2" dur="2" oct="4" pname="g" stem.dir="up">
+                                 <verse xml:id="meyx71i" n="1">
+                                    <syl xml:id="nhlurzf" con="s" wordpos="t">e</syl>
+                                 </verse>
+                                 <verse xml:id="p3ipcdr" n="2">
+                                    <syl xml:id="qlmox9f" con="s" wordpos="t">len.</syl>
+                                 </verse>
+                                 <verse xml:id="s10w4b5t" n="3">
+                                    <syl xml:id="tehqhl0" con="s" wordpos="s">mir,</syl>
+                                 </verse>
+                                 <verse xml:id="vgyts4s" n="4">
+                                    <syl xml:id="wejqg8m" con="s" wordpos="s">Öl</syl>
+                                 </verse>
+                                 <verse xml:id="ydla3fa" n="5">
+                                    <syl xml:id="z1guier" con="s" wordpos="t">ben</syl>
+                                 </verse>
+                                 <verse xml:id="b1dwykg6" n="6">
+                                    <syl xml:id="co5kusp" con="s" wordpos="s">Zeit</syl>
+                                 </verse>
+                              </note>
+                           </layer>
+                           <layer xml:id="gy7qka8" n="2">
+                              <note xml:id="humn0fd" dur.ppq="8" dur="breve" oct="4" pname="d" />
+                              <note xml:id="jgwpg79" dur.ppq="1" dur="4" oct="4" pname="e" stem.dir="down">
+                                 <accid xml:id="k8625j6" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="m14hjf39" dur.ppq="1" dur="4" oct="4" pname="f" stem.dir="down" />
+                              <note xml:id="o15tgi74" dur.ppq="2" dur="2" oct="4" pname="e" stem.dir="down">
+                                 <accid xml:id="p1apeid3" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                           </layer>
+                        </staff>
+                        <staff xml:id="x2clrp5" n="2">
+                           <layer xml:id="yugvjc1" n="1">
+                              <note xml:id="zcfyr4b" dur.ppq="8" dur="breve" oct="3" pname="b">
+                                 <accid xml:id="a181qq13" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="b1hp0gee" dur.ppq="1" dur="4" oct="3" pname="g" stem.dir="up" />
+                              <note xml:id="er5ihbx" dur.ppq="1" dur="4" oct="3" pname="b" stem.dir="up">
+                                 <accid xml:id="f15lbkpw" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="g1k0vcrj" dur.ppq="2" dur="2" oct="3" pname="b" stem.dir="up">
+                                 <accid xml:id="h1r7ivur" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                           </layer>
+                           <layer xml:id="ka8ehpu" n="2">
+                              <note xml:id="lah2fvg" dur.ppq="8" dur="breve" oct="3" pname="g" />
+                              <note xml:id="n10mv5b6" dur.ppq="1" dur="4" oct="3" pname="c" stem.dir="down" />
+                              <note xml:id="qjqzi50" dur.ppq="1" dur="4" oct="3" pname="d" stem.dir="down" />
+                              <note xml:id="s12uhjg4" dur.ppq="2" dur="2" oct="3" pname="e" stem.dir="down">
+                                 <accid xml:id="t1hv31z0" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                           </layer>
+                        </staff>
+                        <slur xml:id="bnwl8eh" startid="#h17mj7fy" endid="#cr1338a" lform="dotted" />
+                        <breath xml:id="f1cjaqcb" staff="1" tstamp="12.5" />
+                        <slur xml:id="l1hpeyji" startid="#jgwpg79" endid="#m14hjf39" lform="dotted" />
+                        <slur xml:id="dzvyg5t" startid="#b1hp0gee" endid="#er5ihbx" lform="dotted" />
+                        <breath xml:id="j6hrhmj" staff="2" tstamp="12.5" />
+                        <slur xml:id="p1bbh8cj" startid="#n10mv5b6" endid="#qjqzi50" lform="dotted" />
+                     </measure>
+                     <measure xml:id="qg1en8" right="end" n="4">
+                        <staff xml:id="zihxlyg" n="1">
+                           <layer xml:id="a1ymsmdh" n="1">
+                              <note xml:id="b1i9buu6" dur.ppq="8" dur="breve" oct="4" pname="f">
+                                 <verse xml:id="d15ea877" n="1">
+                                    <syl xml:id="en2ffeb" con="s" wordpos="s">und führet mich zum frischen</syl>
+                                 </verse>
+                                 <verse xml:id="gjzz3om" n="2">
+                                    <syl xml:id="hn53klv" con="s" wordpos="s">Der Herr ist mein</syl>
+                                 </verse>
+                                 <verse xml:id="jqzeqkc" n="3">
+                                    <syl xml:id="k1ophge8" con="s" wordpos="s">dein Stecken und Stab</syl>
+                                 </verse>
+                                 <verse xml:id="m3mel7e" n="4">
+                                    <syl xml:id="noj072o" con="s" wordpos="s">und schenkest mir</syl>
+                                 </verse>
+                                 <verse xml:id="p1vs45zk" n="5">
+                                    <syl xml:id="q1tki6wf" con="s" wordpos="s">im Hause des Herrn</syl>
+                                 </verse>
+                                 <verse xml:id="s1sa3l9l" n="6">
+                                    <syl xml:id="tol6gq9" con="s" wordpos="s">und in Ewigkeit.</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="vvdhpos" dur.ppq="2" dur="2" oct="4" pname="f" stem.dir="up">
+                                 <verse xml:id="x8nm3aw" n="1">
+                                    <syl xml:id="ydukgtg" con="d" wordpos="i">Was</syl>
+                                 </verse>
+                                 <verse xml:id="a1ejn6gi" n="2">
+                                    <syl xml:id="b9tcnag" con="d" wordpos="i">Hir</syl>
+                                 </verse>
+                                 <verse xml:id="d1mdsviq" n="3">
+                                    <syl xml:id="eks8o1u" con="d" wordpos="i">trös</syl>
+                                 </verse>
+                                 <verse xml:id="gu21jgz" n="4">
+                                    <syl xml:id="haps7go" con="s" wordpos="s">voll</syl>
+                                 </verse>
+                                 <verse xml:id="j1dtd0uc" n="5">
+                                    <syl xml:id="khw3tam" con="d" wordpos="i">im</syl>
+                                 </verse>
+                                 <verse xml:id="m1e84yd9" n="6">
+                                    <syl xml:id="n1x3k55d" con="d" wordpos="i">A</syl>
+                                 </verse>
+                              </note>
+                              <note xml:id="p1a557cd" dur.ppq="2" dur="2" oct="4" pname="e" stem.dir="up">
+                                 <accid xml:id="q11b1ymy" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                                 <verse xml:id="rmba1rg" n="1">
+                                    <syl xml:id="sx4k4l7" con="s" wordpos="t">ser.</syl>
+                                 </verse>
+                                 <verse xml:id="udaod4z" n="2">
+                                    <syl xml:id="v1tfkbov" con="s" wordpos="t">te.</syl>
+                                 </verse>
+                                 <verse xml:id="xciloxx" n="3">
+                                    <syl xml:id="yxwo1xu" con="s" wordpos="t">ten mich.</syl>
+                                 </verse>
+                                 <verse xml:id="a16n7q32" n="4">
+                                    <syl xml:id="b1w47kxw" con="s" wordpos="s">ein.</syl>
+                                 </verse>
+                                 <verse xml:id="do0a4y0" n="5">
+                                    <syl xml:id="ek6f0pc" con="s" wordpos="t">merdar.</syl>
+                                 </verse>
+                                 <verse xml:id="gpm9f1" n="6">
+                                    <syl xml:id="h3fg0z2" con="s" wordpos="t">men.</syl>
+                                 </verse>
+                              </note>
+                           </layer>
+                           <layer xml:id="j1pojhkq" n="2">
+                              <note xml:id="k9pjl6g" dur.ppq="8" dur="breve" oct="4" pname="c" />
+                              <note xml:id="m1xn9h7i" dur.ppq="2" dur="2" oct="4" pname="d" stem.dir="down" />
+                              <note xml:id="owpwxt4" dur.ppq="2" dur="2" oct="4" pname="e" stem.dir="down">
+                                 <accid xml:id="p199owuh" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                           </layer>
+                        </staff>
+                        <staff xml:id="df3uh3b" n="2">
+                           <layer xml:id="e17z63sc" n="1">
+                              <note xml:id="f1gaqy2b" dur.ppq="8" dur="breve" oct="3" pname="a">
+                                 <accid xml:id="g1ak74bo" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="hpd7fgz" dur.ppq="2" dur="2" oct="3" pname="a" stem.dir="up">
+                                 <accid xml:id="i699cwm" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="jjqahpt" dur.ppq="2" dur="2" oct="3" pname="g" stem.dir="up" />
+                           </layer>
+                           <layer xml:id="l1i2c40s" n="2">
+                              <note xml:id="m139oh4u" dur.ppq="8" dur="breve" oct="3" pname="f" />
+                              <note xml:id="o1kdkiip" dur.ppq="2" dur="2" oct="2" pname="b" stem.dir="down">
+                                 <accid xml:id="p1sdbhxi" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                              <note xml:id="qgtmysr" dur.ppq="2" dur="2" oct="3" pname="e" stem.dir="down">
+                                 <accid xml:id="r129kagu" accid.ges="f" glyph.auth="smufl" glyph.name="accidentalFlat" />
+                              </note>
+                           </layer>
+                        </staff>
+                     </measure>
+                  </section>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>

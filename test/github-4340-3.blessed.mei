@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/dev/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/dev/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="6.0-dev">
+   <meiHead xml:id="mryqwr1">
+      <fileDesc xml:id="f1dwss4w">
+         <titleStmt xml:id="tti5ppa">
+            <title>GitHub PR #4341</title>
+            <respStmt />
+         </titleStmt>
+         <pubStmt xml:id="p1qnmwp9" />
+      </fileDesc>
+      <encodingDesc xml:id="eanhbka">
+         <appInfo xml:id="a1yzul3q">
+            <application xml:id="a1r63dwm" isodate="2026-06-04T08:37:11" version="6.3.0-dev-e47a152">
+               <name xml:id="n1wqi5cc">Verovio</name>
+               <p xml:id="p17h98bs">Transcoded from MusicXML</p>
+            </application>
+         </appInfo>
+      </encodingDesc>
+   </meiHead>
+   <music>
+      <body>
+         <mdiv xml:id="a1tlijh0">
+            <score xml:id="b1ybv43i">
+               <scoreDef xml:id="c1icrxf3">
+                  <staffGrp xml:id="egw9da3">
+                     <staffDef xml:id="P1" n="1" lines="5" ppq="1">
+                        <label xml:id="fhgx12p">Piano</label>
+                        <labelAbbr xml:id="hrdvuy9">Pno.</labelAbbr>
+                        <instrDef xml:id="j16m8vt" midi.channel="0" midi.instrnum="0" midi.volume="78%" />
+                        <clef xml:id="s5ce7rh" shape="G" line="2" />
+                        <keySig xml:id="t10kx4zk" sig="0" />
+                        <meterSig xml:id="u1ykuowf" count="4" unit="4" />
+                     </staffDef>
+                  </staffGrp>
+               </scoreDef>
+               <section xml:id="d1skdn2i">
+                  <expansion plist="#k170k0c" xml:id="l1xc9bez" />
+                  <section xml:id="k170k0c">
+                     <measure xml:id="v165u8s5" n="1">
+                        <staff xml:id="e4xcx5f" n="1">
+                           <layer xml:id="f1u0fag6" n="1">
+                              <note xml:id="g18x3m1b" dur.ppq="2" dur="4" oct="4" pname="e" stem.dir="up">
+                                 <accid xml:id="h1gkhi1o" accid="1qs" accid.ges="su" />
+                              </note>
+                              <note xml:id="i17aafi4" dur.ppq="2" dur="4" oct="4" pname="e" stem.dir="up">
+                                 <accid xml:id="j1gunbdb" accid.ges="su" glyph.auth="smufl" glyph.name="accidentalQuarterToneSharpStein" />
+                              </note>
+                           </layer>
+                        </staff>
+                     </measure>
+                  </section>
+               </section>
+            </score>
+         </mdiv>
+      </body>
+   </music>
+</mei>
