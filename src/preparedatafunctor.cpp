@@ -60,7 +60,7 @@ PrepareDataInitializationFunctor::PrepareDataInitializationFunctor(Doc *doc) : D
 FunctorCode PrepareDataInitializationFunctor::VisitAccid(Accid *accid)
 {
     // Call parent one too
-    this->VisitObject(accid);
+    this->VisitLayerElement(accid);
 
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         accid->InitFloatingObject();
@@ -85,7 +85,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitDiv(Div *div)
 FunctorCode PrepareDataInitializationFunctor::VisitChord(Chord *chord)
 {
     // Call parent one too
-    this->VisitObject(chord);
+    this->VisitLayerElement(chord);
 
     if (chord->HasEmptyList()) {
         LogWarning("Chord '%s' has no child note - a default note is added", chord->GetID().c_str());
@@ -110,7 +110,7 @@ FunctorCode PrepareDataInitializationFunctor::VisitFloatingObject(FloatingObject
 FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
 {
     // Call parent one too
-    this->VisitObject(keySig);
+    this->Visit(keySig);
 
     // Clear and regenerate attribute children
     keySig->GenerateKeyAccidAttribChildren();
