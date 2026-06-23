@@ -72,8 +72,8 @@ jobs:
           python3 -m venv .venv-pr
           .venv-dev/bin/python -m pip install --upgrade pip
           .venv-pr/bin/python -m pip install --upgrade pip
-          .venv-dev/bin/python -m pip install build diffimg jsondiff lxml xmldiff cairosvg
-          .venv-pr/bin/python -m pip install build diffimg jsondiff lxml xmldiff cairosvg
+          .venv-dev/bin/python -m pip install build diffimg jsondiff lxml xmldiff cairosvg py_midicsv
+          .venv-pr/bin/python -m pip install build diffimg jsondiff lxml xmldiff cairosvg py_midicsv
 
       - name: Checkout the dev branch
         uses: actions/checkout@v6.0.2
@@ -127,14 +127,22 @@ jobs:
           name: test-suite-diff
           path: ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/
 
-      - name: Check existence of the log.md file
+      - name: Check existence of the log*.md files
         id: check_files
         uses: andstor/file-existence-action@v3
         with:
-          files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md"
+          files: "${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log*.md"
 
       - name: Show the list of changes detected
         if: steps.check_files.outputs.files_exists == 'true'
         run: |
-          echo "This is the list of tests for which a change has been detected:"
-          cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
+          if [ -e ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md ]
+          then
+            echo "This is the list of tests for which a PNG change has been detected:"
+            cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log.md
+          fi
+          if [ -e ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log_midi.md ]
+          then
+            echo "This is the list of tests for which a MIDI change has been detected:"
+            cat ${{ github.workspace }}/${{ env.OUTPUT_DIR }}/log_midi.md
+          fi
