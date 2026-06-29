@@ -3161,8 +3161,8 @@ void MusicXmlInput::ReadMusicXmlNote(
                     if (alterVal != 0.0) {
                         // Clear the carried-over accidentals because pitch/alter takes precedence
                         m_currentAccids[note->GetPname()].clear();
-                        m_currentAccids[note->GetPname()].push_back(
-                            musicxml::Accidental(Att::AccidentalGesturalToWritten(ConvertAlterToAccid(alterVal)), "", ""));
+                        m_currentAccids[note->GetPname()].push_back(musicxml::Accidental(
+                            Att::AccidentalGesturalToWritten(ConvertAlterToAccid(alterVal)), "", ""));
                     }
 
                     try {
@@ -3174,15 +3174,17 @@ void MusicXmlInput::ReadMusicXmlNote(
                             note->AddChild(accid);
                             accid->SetAccidGes(Att::AccidentalWrittenToGestural(current.m_accid));
 
-                            // Because gestural accidentals do not map 1:1 to written accidentals, we may be losing information
-                            // if we rely only on gestural accidentals alone to look up tuning tones. Instead, we set the accidental's
-                            // SMuFL glyph name to whatever was carried over. The custom tuning will always choose the
-                            // SMuFL glyph over the written or gestural accidentals.
-                            // SPECIAL CASE: When the gestural accidental is the same as the written accidental (and not NONE),
-                            // we are sure that the gestural accidental will not lose information, and therefore we don't need
-                            // to explicitly set the SMuFL glyph. This ensures that scores that only feature "regular" accidentals
-                            // will never have redundant SMuFL glyphs.
-                            if (current.m_accid == ACCIDENTAL_WRITTEN_NONE || Att::AccidentalGesturalToWritten(accid->GetAccidGes()) != current.m_accid) {
+                            // Because gestural accidentals do not map 1:1 to written accidentals, we may be losing
+                            // information if we rely only on gestural accidentals alone to look up tuning tones.
+                            // Instead, we set the accidental's SMuFL glyph name to whatever was carried over. The
+                            // custom tuning will always choose the SMuFL glyph over the written or gestural
+                            // accidentals. SPECIAL CASE: When the gestural accidental is the same as the written
+                            // accidental (and not NONE), we are sure that the gestural accidental will not lose
+                            // information, and therefore we don't need to explicitly set the SMuFL glyph. This ensures
+                            // that scores that only feature "regular" accidentals will never have redundant SMuFL
+                            // glyphs.
+                            if (current.m_accid == ACCIDENTAL_WRITTEN_NONE
+                                || Att::AccidentalGesturalToWritten(accid->GetAccidGes()) != current.m_accid) {
                                 if (!current.m_glyphName.empty()) {
                                     accid->SetGlyphName(current.m_glyphName);
                                     accid->SetGlyphAuth(current.m_glyphAuth);
