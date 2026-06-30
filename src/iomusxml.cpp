@@ -3154,15 +3154,22 @@ void MusicXmlInput::ReadMusicXmlNote(
             // adjust accidental (including glyph) based on carried-over accidentals
             // or update the carried-over accidentals with current accidental value.
             if (note->HasPname()) {
+                std::string pitchAlter = PitchAlterToString(note->GetPname(), alterVal);
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
                 if (accids.empty()) {
                     // It can happen that the doc encodes the accidentals in the pitch/alter element only,
                     // regardless of key signature or bar lines. Handle this case here.
                     if (alterVal != 0.0) {
-                        // Clear the carried-over accidentals because pitch/alter takes precedence
-                        m_currentAccids[note->GetPname()].clear();
-                        m_currentAccids[note->GetPname()].push_back(musicxml::Accidental(
-                            Att::AccidentalGesturalToWritten(ConvertAlterToAccid(alterVal)), "", ""));
+                        // In case this alter value is already associated with an accidental, use it here.
+                        if (m_alterAccids.contains(pitchAlter)) {
+                            m_currentAccids[note->GetPname()] = m_alterAccids.at(pitchAlter);
+                        }
+                        // Otherwise, deduce the generic accidental from this alter value.
+                        else {
+                            m_currentAccids[note->GetPname()].clear();
+                            m_currentAccids[note->GetPname()].push_back(musicxml::Accidental(
+                                Att::AccidentalGesturalToWritten(ConvertAlterToAccid(alterVal)), "", ""));
+                        }
                     }
 
                     try {
@@ -3175,7 +3182,7 @@ void MusicXmlInput::ReadMusicXmlNote(
                             accid->SetAccidGes(Att::AccidentalWrittenToGestural(current.m_accid));
 
                             // Because gestural accidentals do not map 1:1 to written accidentals, we may be losing
-                            // information if we rely only on gestural accidentals alone to look up tuning tones.
+                            // information if we rely only on gestural accidentals to look up tuning tones.
                             // Instead, we set the accidental's SMuFL glyph name to whatever was carried over. The
                             // custom tuning will always choose the SMuFL glyph over the written or gestural
                             // accidentals. SPECIAL CASE: When the gestural accidental is the same as the written
@@ -3204,10 +3211,13 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
                 else {
                     m_currentAccids[note->GetPname()].clear();
+                    m_alterAccids[pitchAlter].clear();
                     for (Object *object : accids) {
                         Accid *accid = vrv_cast<Accid *>(object);
                         accid->SetAccidGes(Att::AccidentalWrittenToGestural(accid->GetAccid()));
                         m_currentAccids[note->GetPname()].push_back(
+                            musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
+                        m_alterAccids[pitchAlter].push_back(
                             musicxml::Accidental(accid->GetAccid(), accid->GetGlyphName(), accid->GetGlyphAuth()));
                     }
                 }
@@ -4538,6 +4548,13 @@ curvature_CURVEDIR MusicXmlInput::CombineCurvedir(curvature_CURVEDIR startDir, c
 
 //////////////////////////////////////////////////////////////////////////////
 // String to attribute converters
+
+std::string MusicXmlInput::PitchAlterToString(data_PITCHNAME pname, float alter)
+{
+    std::string noteName(1, (pname - 1 + ('C' - 'A')) % 7 + 'A');
+    std::string pitchAlter = noteName + std::to_string(alter);
+    return pitchAlter;
+}
 
 data_ACCIDENTAL_WRITTEN MusicXmlInput::ConvertAccidentalToAccid(const std::string &value)
 {
