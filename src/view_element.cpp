@@ -1199,10 +1199,8 @@ void View::DrawMeterSig(DeviceContext *dc, MeterSig *meterSig, Staff *staff, int
 
     if (meterSig->HasSym() || meterSig->HasGlyphNum() || meterSig->HasGlyphName()) {
         const char32_t code = meterSig->GetSymbolGlyph();
-        if (code) {
-            this->DrawSmuflCode(dc, x, y, code, glyphSize, false);
-            x += m_doc->GetGlyphWidth(code, glyphSize, false);
-        }
+        this->DrawSmuflCode(dc, x, y, code, glyphSize, false);
+        x += m_doc->GetGlyphWidth(code, glyphSize, false);
     }
     else if (meterSig->GetForm() == METERFORM_num) {
         x += this->DrawMeterSigFigures(dc, x, y, meterSig, 0, staff);
