@@ -1286,6 +1286,8 @@ bool Toolkit::SetOptions(const std::string &jsonOptions)
         this->ResetMidiDoc();
     }
 
+    if (m_editorToolkit) m_editorToolkit->OptionsChanged();
+
     return true;
 }
 
@@ -1542,11 +1544,18 @@ bool Toolkit::Edit(const std::string &editorAction)
     return m_editorToolkit->ParseEditorAction(editorAction);
 }
 
-std::string Toolkit::EditInfo()
+std::string Toolkit::EditResponse()
 {
     if (!m_editorToolkit) return "{}";
 
-    return m_editorToolkit->EditInfo();
+    return m_editorToolkit->EditResponse();
+}
+
+std::string Toolkit::EditStatus()
+{
+    if (!m_editorToolkit) return "{}";
+
+    return m_editorToolkit->EditStatus();
 }
 
 std::string Toolkit::GetLog()
@@ -1742,6 +1751,10 @@ std::string Toolkit::RenderToSVG(int pageNo, bool xmlDeclaration)
 
     if (m_options->m_mmOutput.GetValue()) {
         svg.SetMMOutput(true);
+    }
+
+    if (m_options->m_showHidden.GetValue()) {
+        svg.SetShowHidden(true);
     }
 
     if (m_doc.IsFacs()) {

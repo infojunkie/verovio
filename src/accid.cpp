@@ -86,6 +86,17 @@ void Accid::Reset()
     this->ClearFloatingObject();
 }
 
+bool Accid::IsSupportedChild(ClassId classId)
+{
+    if (classId == ACCID) {
+        // Limit support to note/accid
+        return (this->GetParent() && this->GetParent()->Is(NOTE));
+    }
+    else {
+        return false;
+    }
+}
+
 void Accid::ClearFloatingObject()
 {
     if (m_floatingObject) {
@@ -99,6 +110,18 @@ void Accid::InitFloatingObject()
     assert(!m_floatingObject);
     m_floatingObject = new AccidFloatingObject();
     m_floatingObject->SetParent(this);
+}
+
+void Accid::InitShowAccidGes()
+{
+    // Only to make sure we never loop
+    if (!this->GetParent()->Is(NOTE)) return;
+
+    this->ClearChildren();
+    Accid *accid = new Accid();
+    accid->IsAttribute(true);
+    accid->SetAccid(Att::AccidentalGesturalToWritten(this->GetAccidGes()));
+    if (!this->AddChild(accid)) delete accid;
 }
 
 std::u32string Accid::GetSymbolStr(data_NOTATIONTYPE notationType) const
@@ -268,12 +291,12 @@ std::u32string Accid::CreateSymbolStr(data_ACCIDENTAL_WRITTEN accid, data_ENCLOS
         // If there is glyph.num, prioritize it
         if (glyphNum != 0) {
             code = glyphNum;
-            if (NULL == resources->GetGlyph(code)) code = 0;
+            if (!resources->GetGlyph(code)) code = 0;
         }
         // If there is glyph.name (second priority)
         else if (!glyphName.empty()) {
             code = resources->GetGlyphCode(glyphName);
-            if (NULL == resources->GetGlyph(code)) code = 0;
+            if (!resources->GetGlyph(code)) code = 0;
         }
     }
 

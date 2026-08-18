@@ -24,7 +24,9 @@
 #include "hairpin.h"
 #include "harm.h"
 #include "layer.h"
+#include "lyricelement.h"
 #include "mrpt.h"
+#include "mspace.h"
 #include "pedal.h"
 #include "plistinterface.h"
 #include "reh.h"
@@ -33,6 +35,7 @@
 #include "runningelement.h"
 #include "score.h"
 #include "section.h"
+#include "space.h"
 #include "staff.h"
 #include "stem.h"
 #include "syl.h"
@@ -45,6 +48,7 @@
 #include "tuplet.h"
 #include "turn.h"
 #include "verse.h"
+#include "volta.h"
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
@@ -64,6 +68,9 @@ FunctorCode PrepareDataInitializationFunctor::VisitAccid(Accid *accid)
 
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         accid->InitFloatingObject();
+    }
+    if (accid->HasAccidGes() && m_doc->GetOptions()->m_showHidden.GetValue()) {
+        accid->InitShowAccidGes();
     }
     accid->Modify();
 
@@ -118,6 +125,19 @@ FunctorCode PrepareDataInitializationFunctor::VisitKeySig(KeySig *keySig)
     return FUNCTOR_CONTINUE;
 }
 
+FunctorCode PrepareDataInitializationFunctor::VisitMSpace(MSpace *mSpace)
+{
+    // Call parent one too
+    this->VisitLayerElement(mSpace);
+
+    if (m_doc->GetOptions()->m_showHidden.GetValue()) {
+        mSpace->InitShowMSpace();
+    }
+    mSpace->Modify();
+
+    return FUNCTOR_CONTINUE;
+}
+
 FunctorCode PrepareDataInitializationFunctor::VisitRepeatMark(RepeatMark *repeatMark)
 {
     // Call parent one too
@@ -142,6 +162,19 @@ FunctorCode PrepareDataInitializationFunctor::VisitScore(Score *score)
 
     // Evaluate functor on scoreDef
     score->GetScoreDef()->Process(*this);
+
+    return FUNCTOR_CONTINUE;
+}
+
+FunctorCode PrepareDataInitializationFunctor::VisitSpace(Space *space)
+{
+    // Call parent one too
+    this->VisitLayerElement(space);
+
+    if (m_doc->GetOptions()->m_showHidden.GetValue()) {
+        space->InitShowSpace();
+    }
+    space->Modify();
 
     return FUNCTOR_CONTINUE;
 }
@@ -657,7 +690,9 @@ FunctorCode PrepareTimePointingFunctor::VisitLayerElement(LayerElement *layerEle
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // Do not look for tstamp pointing to these
-    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
+    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, REFRAIN, TUPLET, STEM, VERSE })) {
+        return FUNCTOR_CONTINUE;
+    }
 
     ListOfPointingInterClassIdPairs::iterator iter = m_timePointingInterfaces.begin();
     while (iter != m_timePointingInterfaces.end()) {
@@ -723,7 +758,9 @@ FunctorCode PrepareTimeSpanningFunctor::VisitLayerElement(LayerElement *layerEle
     if (layerElement->IsScoreDefElement()) return FUNCTOR_SIBLINGS;
 
     // Do not look for tstamp pointing to these
-    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
+    if (layerElement->IsAnyOf(std::array{ ARTIC, BEAM, FLAG, REFRAIN, TUPLET, STEM, VERSE })) {
+        return FUNCTOR_CONTINUE;
+    }
 
     ListOfSpanningInterOwnerPairs::iterator iter = m_timeSpanningInterfaces.begin();
     while (iter != m_timeSpanningInterfaces.end()) {
@@ -1032,11 +1069,12 @@ FunctorCode PreparePointersByLayerFunctor::VisitMeasureEnd(Measure *measure)
 // PrepareLyricsFunctor
 //----------------------------------------------------------------------------
 
-PrepareLyricsFunctor::PrepareLyricsFunctor() : Functor()
+PrepareLyricsFunctor::PrepareLyricsFunctor(int voltaTrack) : Functor()
 {
     m_currentSyl = NULL;
     m_lastNoteOrChord = NULL;
     m_penultimateNoteOrChord = NULL;
+    m_voltaTrack = voltaTrack;
 }
 
 FunctorCode PrepareLyricsFunctor::VisitChord(Chord *chord)
@@ -1079,10 +1117,17 @@ FunctorCode PrepareLyricsFunctor::VisitNote(Note *note)
 
 FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 {
-    Verse *verse = vrv_cast<Verse *>(syl->GetFirstAncestor(VERSE, MAX_NOTE_DEPTH));
-    if (verse) {
-        syl->m_drawingVerseN = std::max(verse->GetN(), 1);
-        syl->m_drawingVersePlace = verse->GetPlace();
+    const Volta *volta = vrv_cast<const Volta *>(syl->GetFirstAncestor(VOLTA));
+    const int voltaTrack = volta ? volta->GetDrawingVoltaN() : 0;
+    if (voltaTrack != m_voltaTrack) return FUNCTOR_CONTINUE;
+
+    LyricElement *lyricElement
+        = vrv_cast<LyricElement *>(syl->GetFirstAncestorInRange(LYRIC_ELEMENT, LYRIC_ELEMENT_max, MAX_NOTE_DEPTH));
+    if (lyricElement) {
+        const int lineN = volta ? lyricElement->GetVoltaLineN(volta) : 1;
+        syl->m_drawingVerseN = lyricElement->GetDrawingVerseN() + (lyricElement->Is(REFRAIN) ? lineN - 1 : 0);
+        syl->m_drawingVersePlace = lyricElement->GetPlace();
+        syl->m_drawingVoltaN = lyricElement->Is(REFRAIN) ? 1 : lineN;
     }
 
     syl->SetStart(vrv_cast<LayerElement *>(syl->GetFirstAncestor(NOTE, MAX_NOTE_DEPTH)));
@@ -1139,7 +1184,7 @@ FunctorCode PrepareLyricsFunctor::VisitSyl(Syl *syl)
 // PrepareLayerElementPartsFunctor
 //----------------------------------------------------------------------------
 
-PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor() : Functor() {}
+PrepareLayerElementPartsFunctor::PrepareLayerElementPartsFunctor(Doc *doc) : DocFunctor(doc) {}
 
 FunctorCode PrepareLayerElementPartsFunctor::VisitChord(Chord *chord)
 {
@@ -1283,6 +1328,8 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
     TupletBracket *currentBracket = vrv_cast<TupletBracket *>(tuplet->GetFirst(TUPLET_BRACKET));
     TupletNum *currentNum = vrv_cast<TupletNum *>(tuplet->GetFirst(TUPLET_NUM));
 
+    const bool showHidden = (m_doc->GetOptions()->m_showHidden.GetValue());
+
     bool beamed = false;
     // Are we contained in a beam?
     if (tuplet->GetFirstAncestor(BEAM, MAX_BEAM_DEPTH)) {
@@ -1297,7 +1344,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
         if ((tuplet->GetChildCount(BEAM) == 1) || (tuplet->GetChildCount(BTREM) == 1)) beamed = true;
     }
 
-    if ((!tuplet->HasBracketVisible() && !beamed) || (tuplet->GetBracketVisible() == BOOLEAN_true)) {
+    if ((!tuplet->HasBracketVisible() && !beamed) || showHidden || (tuplet->GetBracketVisible() == BOOLEAN_true)) {
         if (!currentBracket) {
             currentBracket = new TupletBracket();
             tuplet->AddChild(currentBracket);
@@ -1311,7 +1358,7 @@ FunctorCode PrepareLayerElementPartsFunctor::VisitTuplet(Tuplet *tuplet)
         }
     }
 
-    if (tuplet->HasNum() && (!tuplet->HasNumVisible() || (tuplet->GetNumVisible() == BOOLEAN_true))) {
+    if (tuplet->HasNum() && (showHidden || (tuplet->GetNumVisible() != BOOLEAN_false))) {
         if (!currentNum) {
             currentNum = new TupletNum();
             tuplet->AddChild(currentNum);

@@ -1693,6 +1693,18 @@ ClassId ObjectFactory::GetClassId(const std::string &name)
     return it->second;
 }
 
+std::string ObjectFactory::GetClassName(ClassId classId)
+{
+    std::shared_lock lock(m_mutex);
+
+    for (const auto &[name, id] : m_classIdsRegistry) {
+        if (id == classId) return name;
+    }
+
+    LogError("Class name for '%d' not found", static_cast<int>(classId));
+    return "[unspecified]";
+}
+
 void ObjectFactory::GetClassIds(const std::vector<std::string> &classStrings, std::vector<ClassId> &classIds)
 {
     std::shared_lock lock(m_mutex);

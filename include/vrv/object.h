@@ -107,6 +107,7 @@ public:
     bool IsControlElement() const { return Object::IsControlElement(m_classId); }
     bool IsEditorialElement() const { return Object::IsEditorialElement(m_classId); }
     bool IsLayerElement() const { return Object::IsLayerElement(m_classId); }
+    bool IsLyricElement() const { return Object::IsLyricElement(m_classId); }
     bool IsPageElement() const { return Object::IsPageElement(m_classId); }
     bool IsRunningElement() const { return Object::IsRunningElement(m_classId); }
     bool IsScoreDefElement() const { return Object::IsScoreDefElement(m_classId); }
@@ -129,6 +130,7 @@ public:
         return ((classId > EDITORIAL_ELEMENT) && (classId < EDITORIAL_ELEMENT_max));
     }
     static bool IsLayerElement(ClassId classId) { return ((classId > LAYER_ELEMENT) && (classId < LAYER_ELEMENT_max)); }
+    static bool IsLyricElement(ClassId classId) { return ((classId > LYRIC_ELEMENT) && (classId < LYRIC_ELEMENT_max)); }
     static bool IsPageElement(ClassId classId) { return ((classId > PAGE_ELEMENT) && (classId < PAGE_ELEMENT_max)); }
     static bool IsRunningElement(ClassId classId)
     {
@@ -1111,6 +1113,11 @@ public:
      * Get the ClassId from the MEI element string name by making a lookup in the register
      */
     ClassId GetClassId(const std::string &name);
+
+    /**
+     * Get the MEI element name from the ClassId by making a lookup in the register
+     */
+    std::string GetClassName(ClassId classId);
 
     /**
      * Get the correspondings ClassIds from the vector of MEI element string names
