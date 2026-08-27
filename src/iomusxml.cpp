@@ -1960,9 +1960,6 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         else if (IsElement(child, "sound")) {
             this->ReadMusicXmlSound(child, measure, section);
         }
-        else if (IsElement(child, "sound")) {
-            this->ReadMusicXmlSound(child, measure, section);
-        }
         else if (IsElement(child, "figured-bass")) {
             this->ReadMusicXmlFigures(child, measure);
         }
