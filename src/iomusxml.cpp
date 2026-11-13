@@ -322,7 +322,7 @@ void MusicXmlInput::InsertClefToLayer(Staff *staff, Layer *layer, Clef *clef, in
                 const int actualScoreOnSet = start->first;
                 auto end = m_layerTimes.at(otherLayer).upper_bound(actualScoreOnSet);
                 LayerElement *layerElement = (--end)->second;
-                this->InsertClefIntoObject(layerElement, clefToAdd, otherLayer, scoreOnset, true);
+                this->InsertClefIntoObject(layerElement, clefToAdd, otherLayer, actualScoreOnSet, true);
             }
         }
     }
@@ -333,7 +333,6 @@ void MusicXmlInput::InsertClefIntoObject(
 {
     if (layerElement->GetParent()->Is(LAYER)) {
         this->InsertClefIntoObject(layer, clef, layerElement, insertAfter);
-        m_layerTimes.at(layer).emplace(scoreOnset, clef);
     }
     else {
         Object *parent = layerElement->GetParent();
@@ -344,6 +343,7 @@ void MusicXmlInput::InsertClefIntoObject(
             this->InsertClefIntoObject(parent, clef, layerElement, insertAfter);
         }
     }
+    if (insertAfter) m_layerTimes.at(layer).emplace(scoreOnset, clef);
 }
 
 void MusicXmlInput::InsertClefIntoObject(Object *parent, Clef *clef, Object *layerElement, bool insertAfter)
@@ -625,12 +625,22 @@ void MusicXmlInput::OpenTie(Note *note, Tie *tie, int layerNum)
 
 void MusicXmlInput::CloseTie(Note *note, int layerNum)
 {
-    // add all notes with identical pitch/oct to m_tieStopStack
+    // Add notes matching an open tie to m_tieStopStack.
     for (const musicxml::OpenTie &tie : m_tieStack) {
-        if (note->IsEnharmonicWith(tie.m_note)) {
+        if (this->MatchTieNotes(tie.m_note, note)) {
             m_tieStopStack.push_back(musicxml::CloseTie(note, layerNum));
         }
     }
+}
+
+bool MusicXmlInput::MatchTieNotes(const Note *start, const Note *end) const
+{
+    // Staff drawing tuning is not initialized during import, so TAB MIDI pitches cannot be compared yet.
+    if (start->HasTabCourse() || end->HasTabCourse()) {
+        return start->HasTabCourse() && end->HasTabCourse() && start->HasTabFret() && end->HasTabFret()
+            && (start->GetTabCourse() == end->GetTabCourse()) && (start->GetTabFret() == end->GetTabFret());
+    }
+    return start->IsEnharmonicWith(end);
 }
 
 void MusicXmlInput::OpenSlur(Measure *measure, short int number, Slur *slur, curvature_CURVEDIR dir)
@@ -785,7 +795,7 @@ void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
     std::string rawText;
 
-    const Text *tempoText = vrv_cast<const Text *>(tempo->FindDescendantByType(TEXT, 1));
+    const Text *tempoText = vrv_cast<const Text *>(tempo->FindDescendantByType(TEXT, 2));
     if (tempoText) {
         // if there is a tempo text, insert a space
         std::string tempoString = UTF32to8(tempoText->GetText());
@@ -1628,6 +1638,7 @@ short int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(
             if (key) {
                 KeySig *meiKey = ConvertKey(key.node());
                 staffDef->AddChild(meiKey);
+                m_keyAlteredPitches[staffDef->GetN()] = ConvertKeyAlteredPitches(key.node());
                 if (staffDef->GetNotationtype() == NOTATIONTYPE_tab_guitar) meiKey->IsAttribute(true);
             }
 
@@ -1903,12 +1914,15 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
         measure->AddChild(mNum);
     }
 
+    pugi::xml_node attributes = node.child("attributes");
     for (int i = 0; i < nbStaves; ++i) {
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
-        staff->SetVisible(
-            this->ConvertWordToBool(node.child("attributes").child("staff-details").attribute("print-object").value()));
+        std::string xpath = StringFormat("staff-details[@number='%d']", i + 1);
+        pugi::xpath_node staffDetails = attributes.select_node(xpath.c_str());
+        if (!staffDetails) staffDetails = attributes.select_node("staff-details[not(@number)]");
+        staff->SetVisible(this->ConvertWordToBool(staffDetails.node().attribute("print-object").value()));
         measure->AddChild(staff);
         // layers will be added in SelectLayer
     }
@@ -2043,9 +2057,9 @@ void MusicXmlInput::MatchTies(bool matchLayers)
         bool tieMatched = false;
         std::vector<musicxml::CloseTie>::iterator jter;
         for (jter = m_tieStopStack.begin(); jter != m_tieStopStack.end(); ++jter) {
-            // match tie stop with pitch/oct identity, with start note earlier than end note,
+            // Match a tie stop to the same pitch or TAB position, with start note earlier than end note,
             // and with earliest end note.
-            if ((iter->m_note->IsEnharmonicWith(jter->m_note))
+            if (this->MatchTieNotes(iter->m_note, jter->m_note)
                 && (iter->m_note->GetScoreTimeOnset() < jter->m_note->GetScoreTimeOnset())
                 && (!matchLayers || (iter->m_layerNum == jter->m_layerNum))) {
                 iter->m_tie->SetEndid("#" + jter->m_note->GetID());
@@ -2091,6 +2105,17 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Section *section
             m_clefChangeQueue.push_back(musicxml::ClefChange(
                 m_measureCounts.at(measure), staff, m_currentLayer, meiClef, m_durTotal, afterBarline));
             m_clefChanged++;
+        }
+    }
+
+    // keep track of the pitches altered by key changes, a key without number applies to all staves
+    for (pugi::xml_node keyNode : node.children("key")) {
+        const int keyStaffNum = keyNode.attribute("number").as_int();
+        for (int i = 0; i < measure->GetChildCount(STAFF); ++i) {
+            if ((keyStaffNum > 0) && (keyStaffNum != i + 1)) continue;
+            Staff *staff = vrv_cast<Staff *>(measure->GetChild(i, STAFF));
+            assert(staff);
+            m_keyAlteredPitches[staff->GetN()] = ConvertKeyAlteredPitches(keyNode);
         }
     }
 
@@ -2269,7 +2294,7 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     const pugi::xml_node typeNode = node.child("direction-type");
     const pugi::xpath_node voice = node.select_node("voice");
-    const short int offset = node.child("offset").text().as_int();
+    const int offset = node.child("offset").text().as_int();
     const pugi::xml_node staffNode = node.child("staff");
     const pugi::xml_node soundNode = node.child("sound");
 
@@ -2862,9 +2887,12 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
 
     int durOffset = 0;
 
-    std::string harmText = GetContentOfChild(node, "root/root-step");
+    // root-step@text, when present, replaces the step in the displayed text. An empty value hides the root,
+    // which is how the "none" kind (no chord) is expected to be encoded.
+    pugi::xml_node rootStep = node.child("root").child("root-step");
+    std::string harmText = rootStep.attribute("text") ? rootStep.attribute("text").as_string() : GetContent(rootStep);
     pugi::xpath_node alter = node.select_node("root/root-alter");
-    if (harmText.empty()) {
+    if (!rootStep) {
         pugi::xml_node numeral = node.select_node("numeral/numeral-root").node();
         harmText = numeral.attribute("text") ? numeral.attribute("text").as_string() : numeral.text().as_string();
         alter = node.select_node("numeral/numeral-alter");
@@ -2875,7 +2903,7 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure)
         if (HasAttributeWithValue(kind, "use-symbols", "yes")) {
             harmText = harmText + ConvertKindToSymbol(GetContent(kind));
         }
-        else if (kind.attribute("text") && std::strcmp(kind.text().as_string(), "none")) {
+        else if (kind.attribute("text")) {
             harmText = harmText + kind.attribute("text").as_string();
         }
         else {
@@ -3169,8 +3197,11 @@ void MusicXmlInput::ReadMusicXmlNote(
             const float alterVal = pitch.child("alter").text().as_float();
             const int octaveNum = pitch.child("octave").text().as_int();
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
-            if (m_octDis[staff->GetN()] != 0) {
-                note->SetOct(octaveNum - m_octDis[staff->GetN()]);
+            // The written octave follows the octave shift of the staff the note is drawn on. The sounding octave
+            // is also made explicit when the staff of the layer is shifted, since a cross-staff note is not
+            // affected by it.
+            if ((m_octDis[notationStaffN] != 0) || (m_octDis[staff->GetN()] != 0)) {
+                note->SetOct(octaveNum - m_octDis[notationStaffN]);
                 note->SetOctGes(octaveNum);
             }
             else {
@@ -3184,6 +3215,10 @@ void MusicXmlInput::ReadMusicXmlNote(
                 ListOfObjects accids = note->FindAllDescendantsByType(ACCID);
                 if (accids.empty()) {
                     std::vector<musicxml::Accidental> currentAccids;
+                    // A natural needs to be explicit when the key signature alters the pitch
+                    const auto keyIter = m_keyAlteredPitches.find(notationStaffN);
+                    const bool isAlteredByKey
+                        = (keyIter != m_keyAlteredPitches.end()) && keyIter->second.contains(note->GetPname());
 
                     // Use the alter value as key to the accidentals.
                     // In case this alter value is already associated with an accidental, use it here.
@@ -3198,8 +3233,9 @@ void MusicXmlInput::ReadMusicXmlNote(
 
                     try {
                         for (const auto &current : currentAccids) {
-                            // Avoid adding empty accidentals
-                            if ((current.m_accid == ACCIDENTAL_WRITTEN_NONE || current.m_accid == ACCIDENTAL_WRITTEN_n)
+                            // Avoid adding empty accidentals, and naturals that are not altered by the key signature
+                            if ((current.m_accid == ACCIDENTAL_WRITTEN_NONE
+                                    || (current.m_accid == ACCIDENTAL_WRITTEN_n && !isAlteredByKey))
                                 && current.m_glyphName.empty())
                                 continue;
 
@@ -3421,7 +3457,9 @@ void MusicXmlInput::ReadMusicXmlNote(
             if (!lyric.child("text")) continue;
             Verse *verse = new Verse();
             verse->SetColor(lyric.attribute("color").as_string());
-            // verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrelBasic(lyric.attribute("placement").as_string()));
+            if (lyric.attribute("placement")) {
+                verse->SetPlace(verse->AttPlacementRelStaff::StrToStaffrel(lyric.attribute("placement").as_string()));
+            }
             verse->SetLabel(lyric.attribute("name").as_string());
             verse->SetN(lyricNumber);
             std::string syllabic = "single";
@@ -3560,9 +3598,6 @@ void MusicXmlInput::ReadMusicXmlNote(
             }
         }
 
-        // ties
-        this->ReadMusicXmlTies(node, layer, note, measure);
-
         // articulation
         std::list<Artic *> artics;
         for (pugi::xml_node articulations : notations.node().children("articulations")) {
@@ -3682,6 +3717,9 @@ void MusicXmlInput::ReadMusicXmlNote(
                 }
             }
         }
+
+        // Read ties after technical notation has set the TAB course and fret.
+        this->ReadMusicXmlTies(node, layer, note, measure);
 
         // add the note to the layer or to the current container
         this->AddLayerElement(layer, note, duration);
@@ -4028,7 +4066,7 @@ void MusicXmlInput::ReadMusicXmlNote(
 
     // beam end
     bool beamEnd = node.select_node("beam[text()='end']");
-    if (beamEnd) {
+    if (beamEnd && !isChord) {
         int breakSec = (int)node.select_nodes("beam[text()='continue']").size();
         if (breakSec) {
             if (element->Is(NOTE)) {
@@ -4193,13 +4231,14 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
     if (abletonTuning) {
         const std::string tuningDef
             = std::regex_replace(abletonTuning.node().text().as_string(), std::regex("(^\\s+|\\s+$)"), "");
-        CustomTuning tuning(tuningDef, m_doc, true);
-        if (tuning.IsValid()) {
+        CustomTuning *tuning = new CustomTuning(tuningDef, m_doc, true);
+        if (tuning->IsValid()) {
             ScoreDef *scoreDef = GetOrCreateLastScoreDef(section);
             assert(scoreDef);
             scoreDef->SetCustomTuning(tuning);
         }
         else {
+            delete tuning;
             LogWarning("MusicXML import: Error parsing tuning definition");
         }
     }
@@ -4254,9 +4293,11 @@ void MusicXmlInput::ReadMusicXmlSound(pugi::xml_node node, Measure *measure, Sec
         m_fineInfo = musicxml::FineInfo(true);
     }
 
+    // A tempo within a direction is already handled by ReadMusicXmlDirection
+    const bool inDirection = IsElement(node.parent(), "direction");
     const float bpm = node.attribute("tempo").as_float();
-    if (bpm > 0) {
-        const short int offset = node.child("offset").text().as_int();
+    if (bpm > 0 && !inDirection) {
+        const int offset = node.child("offset").text().as_int();
         const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
         Tempo *tempo = new Tempo();
         tempo->SetMidiBpm(bpm);
@@ -4287,51 +4328,53 @@ bool MusicXmlInput::ReadMusicXmlBeamsAndTuplets(const pugi::xml_node &node, Laye
         const int distance = static_cast<int>(std::distance(beamEndIterator, tupletEndIterator));
         if (distance > 0) {
             if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
-            this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            if (!isChord) this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
         }
         else {
-            this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            if (!isChord) this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
             if (!isChord) ReadMusicXmlTupletStart(node, tupletStart.node(), layer);
         }
     }
     // If note is a start of the beam only - check if there is a tuplet starting/ending in the span of
     // the whole duration of this beam
     else if (beamStart) {
-        // find whether there is a tuplet that starts during the span of the beam
-        pugi::xpath_node nextTupletStart
-            = node.select_node("./following-sibling::note[notations/tuplet[@type='start']]").node();
+        if (!isChord) {
+            // find whether there is a tuplet that starts during the span of the beam
+            pugi::xpath_node nextTupletStart
+                = node.select_node("./following-sibling::note[notations/tuplet[@type='start']]").node();
 
-        // find start and end of the beam
-        const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
-        const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
+            // find start and end of the beam
+            const auto beamStartIterator = std::find(currentMeasureNodes.begin(), currentMeasureNodes.end(), node);
+            const auto beamEndIterator = std::find(beamStartIterator, currentMeasureNodes.end(), beamEnd);
 
-        // find staff number for the corresponding elements - we do not want to match beam start on one staff with beam
-        // end on another
-        pugi::xpath_node nodeStaff = node.select_node("staff");
-        pugi::xpath_node endBeamStaff = beamEnd.select_node("staff");
+            // find staff number for the corresponding elements - we do not want to match beam start on one staff with
+            // beam end on another
+            pugi::xpath_node nodeStaff = node.select_node("staff");
+            pugi::xpath_node endBeamStaff = beamEnd.select_node("staff");
 
-        if (beamEndIterator == currentMeasureNodes.end()
-            || (nodeStaff && endBeamStaff
-                && (nodeStaff.node().text().as_int() != endBeamStaff.node().text().as_int()))) {
-            std::string measureName = (currentMeasure.node().attribute("id"))
-                ? currentMeasure.node().attribute("id").as_string()
-                : currentMeasure.node().attribute("number").as_string();
-            LogDebug("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
-            return false;
-        }
-        // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
-        std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
-        bool isTupletStartInBeam
-            = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), nextTupletStart.node()));
-        bool isTupletEndInBeam = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), tupletEnd));
-        // in case if there is only start/end of the tuplet in the beam, then we need to use beamSpan instead
-        if ((tupletEnd != beamEnd) && (isTupletStartInBeam != isTupletEndInBeam)) {
-            // TODO: same call as in else-case is intentional. Proper beamSpan support will need to be implemented
-            // before this case can be handled correctly
-            this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
-        }
-        else {
-            this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            if (beamEndIterator == currentMeasureNodes.end()
+                || (nodeStaff && endBeamStaff
+                    && (nodeStaff.node().text().as_int() != endBeamStaff.node().text().as_int()))) {
+                std::string measureName = (currentMeasure.node().attribute("id"))
+                    ? currentMeasure.node().attribute("id").as_string()
+                    : currentMeasure.node().attribute("number").as_string();
+                LogDebug("MusicXML import: Beam without end in measure %s treated as <beamSpan>", measureName.c_str());
+                return false;
+            }
+            // form vector of the beam nodes and find whether there are tuplets that start or end within the beam
+            std::vector<pugi::xml_node> beamNodes(beamStartIterator, beamEndIterator + 1);
+            bool isTupletStartInBeam
+                = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), nextTupletStart.node()));
+            bool isTupletEndInBeam = (beamNodes.end() != std::find(beamNodes.begin(), beamNodes.end(), tupletEnd));
+            // in case if there is only start/end of the tuplet in the beam, then we need to use beamSpan instead
+            if ((tupletEnd != beamEnd) && (isTupletStartInBeam != isTupletEndInBeam)) {
+                // TODO: same call as in else-case is intentional. Proper beamSpan support will need to be implemented
+                // before this case can be handled correctly
+                this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            }
+            else {
+                this->ReadMusicXmlBeamStart(node, beamStart.node(), layer);
+            }
         }
     }
     // no special logic needed if we have just tupletStart - just read it as is
@@ -4395,8 +4438,8 @@ void MusicXmlInput::ReadMusicXmlTies(const pugi::xml_node &node, Layer *layer, N
         if (tieType.empty()) {
             continue;
         }
-        else if (tieType == "stop") { // add to stack if (endTie) or if pitch/oct match to open tie on m_tieStack
-            if (!m_tieStack.empty() && note->IsEnharmonicWith(m_tieStack.back().m_note)
+        else if (tieType == "stop") { // Match the most recent open tie or defer matching.
+            if (!m_tieStack.empty() && this->MatchTieNotes(m_tieStack.back().m_note, note)
                 && (m_tieStack.back().m_layerNum == layer->GetN())) {
                 m_tieStack.back().m_tie->SetEndid("#" + note->GetID());
                 m_tieStack.pop_back();
@@ -4543,6 +4586,27 @@ KeySig *MusicXmlInput::ConvertKey(const pugi::xml_node &key)
     }
 
     return keySig;
+}
+
+std::set<data_PITCHNAME> MusicXmlInput::ConvertKeyAlteredPitches(const pugi::xml_node &key)
+{
+    std::set<data_PITCHNAME> alteredPitches;
+    if (key.child("fifths")) {
+        const int fifths = key.child("fifths").text().as_int();
+        const std::string order = (fifths > 0) ? "FCGDAEB" : "BEADGCF";
+        for (int i = 0; i < std::min(abs(fifths), 7); ++i) {
+            alteredPitches.insert(ConvertStepToPitchName(std::string(1, order.at(i))));
+        }
+    }
+    else {
+        for (pugi::xml_node keyStep : key.children("key-step")) {
+            const pugi::xml_node keyAlter = keyStep.next_sibling("key-alter");
+            if (keyAlter && (keyAlter.text().as_float() != 0.0)) {
+                alteredPitches.insert(ConvertStepToPitchName(keyStep.text().as_string()));
+            }
+        }
+    }
+    return alteredPitches;
 }
 
 ScoreDef *MusicXmlInput::GetOrCreateLastScoreDef(Section *section)
