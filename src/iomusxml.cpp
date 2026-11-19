@@ -1942,8 +1942,12 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     bool isMRestInOtherSystem = (mrestPositonIter != m_multiRests.end());
     int multiRestStaffNumber = 1;
 
+    // the furthest point reached in the measure: the file may end it after a <backup> (e.g. to a chord symbol)
+    int durMax = 0;
+
     // read the content of the measure
     for (pugi::xml_node child : node) {
+        durMax = std::max(durMax, m_durTotal);
         // first check if there is a multi measure rest
         if (child.select_node(".//multiple-rest")) {
             const pugi::xml_node multiRestNode = child.select_node(".//multiple-rest").node();
@@ -2007,10 +2011,11 @@ bool MusicXmlInput::ReadMusicXmlMeasure(
     }
 
     // set metcon to false for pickup measures
+    durMax = std::max(durMax, m_durTotal);
     int measureTotal = m_ppq * 4;
     for (const int &num : m_meterCount) measureTotal *= num;
     measureTotal /= m_meterUnit;
-    if (m_durTotal && m_durTotal != measureTotal) {
+    if (durMax && durMax != measureTotal) {
         measure->SetMetcon(BOOLEAN_false);
     }
 
@@ -2300,7 +2305,16 @@ void MusicXmlInput::ReadMusicXmlDirection(
 
     const double timeStamp = (double)(m_durTotal + offset) * (double)m_meterUnit / (double)(4 * m_ppq) + 1.0;
 
-    if (voice) m_prevLayer = SelectLayer(node, measure);
+    if (voice) {
+        // The voice of a direction only tells where it belongs. It must not select the layer of the notes that follow:
+        // a direction of voice 1 between the notes of voice 2 would otherwise move them into layer 1.
+        Layer *currentLayer = m_currentLayer;
+        const bool isLayerInitialized = m_isLayerInitialized;
+        m_isLayerInitialized = false;
+        m_prevLayer = this->SelectLayer(node, measure);
+        m_currentLayer = currentLayer;
+        m_isLayerInitialized = isLayerInitialized;
+    }
 
     // Bracket
     pugi::xml_node bracket = typeNode.child("bracket");
