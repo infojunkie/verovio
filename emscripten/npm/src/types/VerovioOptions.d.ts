@@ -355,6 +355,13 @@ export interface VerovioOptions {
     outputIndentTab?: boolean;
 
     /**
+     * Output using the release version of the MEI schema
+     *
+     * default: false
+     */
+    outputReleaseSchema?: boolean;
+
+    /**
      * Output SMuFL characters as XML entities instead of hex byte codes
      *
      * default: false
